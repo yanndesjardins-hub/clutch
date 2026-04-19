@@ -22,7 +22,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; -webkit-text-size-adjust: 120%; }
+html { font-size: 16px; -webkit-text-size-adjust: 110%; }
 
 body {
   background: var(--bg);
