@@ -119,7 +119,7 @@ export default function Login() {
             alt="Clutch"
             style={{ height: 120, marginBottom: 12 }}
           />
-          <p style={{ color: "var(--text3)", fontSize: 12, letterSpacing: 3 }}>
+          <p style={{ color: "var(--text3)", fontSize: 16, letterSpacing: 2 }}>
             NBA PLAYOFFS 2026
           </p>
         </div>
