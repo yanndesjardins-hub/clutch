@@ -84,6 +84,17 @@ h1,h2,h3,h4,.condensed { font-family: 'inter', sans-serif; }
   text-transform: uppercase; color: var(--purple); margin-bottom: 6px;
 }
 
+/* ── formulaire inscription ─────────────────────────────── */
+.label-form {
+  display: block;
+  font-family: 'inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+
+
 /* ── Badges ─────────────────────────────── */
 .badge {
   display: inline-block; padding: 2px 8px; border-radius: 4px;
