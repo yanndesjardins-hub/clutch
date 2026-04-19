@@ -15,7 +15,7 @@ export const TEAMS = {
   east: [
     { seed: 1, name: 'Detroit Pistons',    abbr: 'DET', color: '#C8102E', emoji: '🔴' },
     { seed: 2, name: 'Boston Celtics',     abbr: 'BOS', color: '#007A33', emoji: '🍀' },
-    { seed: 3, name: 'New York Knicks',    abbr: 'NYC', color: '#F58426', emoji: '🗽' },
+    { seed: 3, name: 'New York Knicks',    abbr: 'NYK', color: '#F58426', emoji: '🗽' },
     { seed: 4, name: 'Cleveland Cavaliers',abbr: 'CLE', color: '#860038', emoji: '⚔️' },
     { seed: 5, name: 'Toronto Raptors',    abbr: 'TOR', color: '#CE1141', emoji: '🦖' },
     { seed: 6, name: 'Atlanta Hawks',      abbr: 'ATL', color: '#C1D32F', emoji: '🦅' },
