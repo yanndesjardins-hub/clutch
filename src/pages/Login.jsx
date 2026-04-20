@@ -18,7 +18,7 @@ const RADIO = ({ name, value, checked, onChange, label }) => (
       value={value}
       checked={checked}
       onChange={onChange}
-      style={{ accentColor: "var(--purple)", width: 16, height: 16 }}
+      style={{ accentColor: "var(--purple)", width: 20, height: 20 }}
     />
     {label}
   </label>
@@ -33,6 +33,7 @@ export default function Login() {
 
   // Signup fields
   const [firstName, setFirstName] = useState("");
+  const [postcode, setPostcode] = useState("");
   const [playsBasket, setPlaysBasket] = useState("");
   const [followsNBA, setFollowsNBA] = useState("");
   const [followsEuro, setFollowsEuro] = useState("");
@@ -47,6 +48,7 @@ export default function Login() {
   function signupValid() {
     return (
       firstName.trim() &&
+      postcode.trim() &&
       email.trim() &&
       pwd.length >= 6 &&
       playsBasket &&
@@ -72,6 +74,7 @@ export default function Login() {
           await supabase.from("profiles").upsert({
             id: data.user.id,
             display_name: firstName.trim(),
+            postcode: postcode.trim(),
             plays_basketball: playsBasket === "yes",
             follows_nba: followsNBA === "yes",
             follows_euro: followsEuro === "yes",
@@ -119,8 +122,8 @@ export default function Login() {
             alt="Clutch"
             style={{ height: 120, marginBottom: 12 }}
           />
-          <p style={{ color: "var(--text3)", fontSize: 16, letterSpacing: 2 }}>
-            NBA PLAYOFFS 2026
+          <p style={{ color: "var(--text3)", fontSize: 16, letterSpacing: 0 }}>
+            Predict NBA playoff results with your friends, till the finals!🏀🔮
           </p>
         </div>
 
@@ -175,14 +178,27 @@ export default function Login() {
             {mode === "signup" && (
               <>
                 <div>
-                  <label className="label-form">First Name *</label>
+                  <label className="label-form">Your Name *</label>
                   <input
                     className="input"
                     type="text"
-                    placeholder="Your first name"
+                    placeholder="Your Name (doesn't need to be your real name :)"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     required
+                  />
+                </div>
+
+                <div>
+                  <label className="label-form">Your postcode *</label>
+                  <input
+                    className="input"
+                    type="text"
+                    placeholder="e.g. 75011"
+                    value={postcode}
+                    onChange={(e) => setPostcode(e.target.value)}
+                    required
+                    maxLength={10}
                   />
                 </div>
 
@@ -257,7 +273,7 @@ export default function Login() {
                   <input
                     className="input"
                     type="text"
-                    placeholder="e.g. Boston Celtics"
+                    placeholder="e.g. Miami Heat"
                     value={favTeam}
                     onChange={(e) => setFavTeam(e.target.value)}
                   />
@@ -307,18 +323,6 @@ export default function Login() {
                 {showPwd ? "🙈" : "👁️"}
               </button>
             </div>
-            {/* <div>
-              <label className="label-form">Password *</label>
-              <input
-                className="input"
-                type="password"
-                placeholder="••••••••"
-                value={pwd}
-                onChange={(e) => setPwd(e.target.value)}
-                required
-                minLength={6}
-              />
-            </div> */}
 
             {/* EMAIL CONSENT */}
             {mode === "signup" && (
@@ -332,8 +336,9 @@ export default function Login() {
                 />
                 <label htmlFor="consent">
                   I agree to receive email communications from the team that
-                  created this game regarding basketball (news, events). I can
-                  unsubscribe at any time via the link included in each email. *
+                  created this game regarding basketball (follow up on this
+                  game, other news, events). I can unsubscribe at any time via
+                  the link included in each email. *
                 </label>
               </div>
             )}
