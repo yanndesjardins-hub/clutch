@@ -281,3 +281,9 @@ h4,
 .w-full {
   width: 100%;
 }
+
+/* Bracket horizontal scrollbar — thicker for usability */
+.bracket-scroll::-webkit-scrollbar { height: 10px; }
+.bracket-scroll::-webkit-scrollbar-track { background: var(--bg3); border-radius: 5px; }
+.bracket-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 5px; }
+.bracket-scroll::-webkit-scrollbar-thumb:hover { background: var(--purple); }

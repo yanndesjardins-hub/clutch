@@ -4,6 +4,7 @@ import { buildSeriesMap } from '../lib/nbaApi'
 import { supabase } from '../lib/supabase'
 import BracketSlot from '../components/BracketSlot'
 import PredictionModal from '../components/PredictionModal'
+import Countdown from '../components/Countdown'
 
 const PAST_DEADLINE = new Date() > PLAYOFF_DEADLINE
 
@@ -20,7 +21,7 @@ export default function PlayoffView({ group, profile }) {
       const { seriesMap: sm } = await buildSeriesMap()
       setSeriesMap(sm)
       const { data } = await supabase.from('predictions').select('*')
-        .eq('user_id', profile.id).eq('group_id', group.id)
+        .eq('user_id', profile.id)
       const pMap = {}
       data?.forEach(p => {
         if (!pMap[p.series_key]) pMap[p.series_key] = {}
@@ -36,7 +37,7 @@ export default function PlayoffView({ group, profile }) {
 
   async function savePrediction({ seriesKey, type, predicted_winner, predicted_games }) {
     const { error } = await supabase.from('predictions').upsert({
-      user_id: profile.id, group_id: group.id,
+      user_id: profile.id, 
       series_key: seriesKey, type, predicted_winner, predicted_games,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'user_id,group_id,series_key,type' })
@@ -110,7 +111,7 @@ export default function PlayoffView({ group, profile }) {
 
   return (
     <div className="page fade-up">
-      {/* NO banner — removed */}
+      <Countdown />
 
       {/* Conf tabs */}
       <div style={{ display:'flex', background:'var(--bg2)', borderRadius:'var(--r)', border:'1px solid var(--border)', overflow:'hidden', marginBottom:16 }}>
@@ -125,7 +126,7 @@ export default function PlayoffView({ group, profile }) {
       </div>
 
       {/* Bracket horizontal scroll */}
-      <div style={{ overflowX:'auto', paddingBottom:8 }}>
+      <div style={{ overflowX:'auto', paddingBottom:12 }} className="bracket-scroll">
         <div style={{ display:'flex', gap:12, minWidth:'max-content', alignItems:'flex-start' }}>
 
           <RoundCol title="Round 1" slots={slots.r1}

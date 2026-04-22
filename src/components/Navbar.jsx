@@ -1,6 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 
-// SVG icons — color-aware
 function TrophyIcon({ color }) {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -41,11 +40,21 @@ function BookIcon({ color }) {
   )
 }
 
+function UserIcon({ color }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="8" r="4"/>
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+    </svg>
+  )
+}
+
 const TABS = [
   { path: '/group/bracket',  Icon: TrophyIcon,   label: 'Bracket'  },
   { path: '/group/series',   Icon: CalendarIcon, label: 'Series'   },
   { path: '/group/rankings', Icon: BarChartIcon, label: 'Rankings' },
   { path: '/group/rules',    Icon: BookIcon,     label: 'Rules'    },
+  { path: '/group/account',  Icon: UserIcon,     label: 'Account'  },
 ]
 
 const PURPLE = '#9170ff'
@@ -65,19 +74,12 @@ export default function Navbar({ group, onLeave }) {
         display:'flex', alignItems:'center', justifyContent:'space-between',
         padding:'0 16px', height:48,
       }}>
-        <img
-          src="/clutch_logo.png"
-          alt="Clutch"
-          onClick={onLeave}
+        <img src="/clutch_logo.png" alt="Clutch" onClick={onLeave}
           style={{ height:44, cursor:'pointer', transition:'opacity 0.2s' }}
           onMouseEnter={e => e.target.style.opacity = '0.75'}
-          onMouseLeave={e => e.target.style.opacity = '1'}
-        />
-        <span style={{
-          fontSize:12, color:'var(--text3)',
-          fontFamily:'Barlow Condensed', letterSpacing:1,
-          maxWidth:200, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
-        }}>
+          onMouseLeave={e => e.target.style.opacity = '1'} />
+        <span style={{ fontSize:12, color:'var(--text3)', fontFamily:'Barlow Condensed',
+          letterSpacing:1, maxWidth:200, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
           {group?.name}
         </span>
       </div>
@@ -100,10 +102,8 @@ export default function Navbar({ group, onLeave }) {
               cursor:'pointer', transition:'all 0.15s', padding:'6px 0',
             }}>
               <Icon color={color} />
-              <span style={{
-                fontFamily:'Barlow Condensed', fontSize:10, fontWeight:700,
-                letterSpacing:1, textTransform:'uppercase', color,
-              }}>
+              <span style={{ fontFamily:'Barlow Condensed', fontSize:9, fontWeight:700,
+                letterSpacing:1, textTransform:'uppercase', color }}>
                 {label}
               </span>
             </button>

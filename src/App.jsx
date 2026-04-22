@@ -2,15 +2,17 @@ import { useState, useEffect } from 'react'
 import { Routes, Route, Navigate, useNavigate, useParams, Outlet } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { supabase } from './lib/supabase'
-import Login       from './pages/Login'
-import GroupHub    from './pages/GroupHub'
-import PlayoffView from './pages/PlayoffView'
-import SeriesView  from './pages/SeriesView'
-import Rankings    from './pages/Rankings'
-import Rules       from './pages/Rules'
-import Navbar      from './components/Navbar'
+import Login          from './pages/Login'
+import GroupHub       from './pages/GroupHub'
+import PlayoffView    from './pages/PlayoffView'
+import SeriesView     from './pages/SeriesView'
+import Rankings       from './pages/Rankings'
+import Rules          from './pages/Rules'
+import Account        from './pages/Account'
+import Terms          from './pages/Terms'
+import ResetPassword  from './pages/ResetPassword'
+import Navbar         from './components/Navbar'
 
-// Initial loading spinner
 function Loader() {
   return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', fontSize:40 }}>
@@ -19,17 +21,15 @@ function Loader() {
   )
 }
 
-// Layout avec Navbar pour les pages "in-group"
-function GroupLayout({ group, onLeave }) {
+function GroupLayout({ group, onLeave, profile }) {
   return (
     <>
-      <Outlet context={{ group }} />
+      <Outlet context={{ group, profile }} />
       <Navbar group={group} onLeave={onLeave} />
     </>
   )
 }
 
-// Route that auto-joins a group via invite code in the URL
 function JoinRoute({ profile }) {
   const { code } = useParams()
   const navigate  = useNavigate()
@@ -54,7 +54,6 @@ export default function App() {
   const { session, profile } = useAuth()
   const [activeGroup, setActiveGroup] = useState(null)
 
-  // Mémorise le group actif pour éviter de le perdre au refresh
   useEffect(() => {
     const saved = sessionStorage.getItem('hc_group')
     if (saved) setActiveGroup(JSON.parse(saved))
@@ -70,38 +69,43 @@ export default function App() {
     sessionStorage.removeItem('hc_group')
   }
 
-  // Load initial session
   if (session === undefined) return <Loader />
 
-  // Non connecté → Login (stocke le code d'invite si présent dans l'URL)
+  // Public routes (no auth needed)
   if (!session) {
     const code = window.location.pathname.match(/\/join\/(.+)/)?.[1]
     if (code) sessionStorage.setItem('hc_pending_invite', code)
+
+    // Reset password page is accessible without full session
+    if (window.location.pathname === '/reset-password') return <ResetPassword />
+    if (window.location.pathname === '/terms') return <Terms />
+
     return <Login />
   }
 
   return (
     <Routes>
-      {/* Route d'invitation directe */}
-      <Route path="/join/:code" element={<JoinRoute profile={profile} />} />
+      <Route path="/join/:code"      element={<JoinRoute profile={profile} />} />
+      <Route path="/reset-password"  element={<ResetPassword />} />
+      <Route path="/terms"           element={<Terms />} />
 
-      {/* Group hub */}
       <Route path="/" element={
         activeGroup
           ? <Navigate to="/group/bracket" replace />
           : <GroupHub profile={profile} onSelectGroup={selectGroup} />
       } />
 
-      {/* Pages in-group */}
       <Route path="/group" element={
         activeGroup
-          ? <GroupLayout group={activeGroup} onLeave={leaveGroup} />
+          ? <GroupLayout group={activeGroup} onLeave={leaveGroup} profile={profile} />
           : <Navigate to="/" replace />
       }>
         <Route path="bracket"  element={<PlayoffView group={activeGroup} profile={profile} />} />
         <Route path="series"   element={<SeriesView  group={activeGroup} profile={profile} />} />
         <Route path="rankings" element={<Rankings    group={activeGroup} profile={profile} />} />
         <Route path="rules"    element={<Rules />} />
+        <Route path="terms"    element={<Terms />} />
+        <Route path="account"  element={<Account profile={profile} group={activeGroup} onLeave={leaveGroup} />} />
         <Route index           element={<Navigate to="bracket" replace />} />
       </Route>
 
