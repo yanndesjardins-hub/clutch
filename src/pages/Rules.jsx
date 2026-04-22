@@ -49,7 +49,7 @@ export default function Rules() {
           THEORETICAL MAXIMUM SCORE
         </div>
         <div className="condensed" style={{ fontSize:48, fontWeight:900, color:'var(--purple)' }}>
-          {(15 * 15) + (9 * 15) + (10 * 2) + 20 + 50}
+          {(15 * 15) + (9 * 7) + (10 * 2) + 20 + 50}
         </div>
         <div style={{ fontSize:11, color:'var(--text3)', marginTop:4 }}>points (nearly impossible 😅)</div>
       </div>
