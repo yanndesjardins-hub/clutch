@@ -14,37 +14,41 @@ export default function Rankings({ group, profile }) {
     try {
       const { seriesMap: sm } = await buildSeriesMap()
 
+      // All predictions (no group_id anymore — shared across groups)
+      const { data: allPreds } = await supabase.from('predictions').select('*')
+
       // ── Your Team ─────────────────────────────────────────────
       const { data: members } = await supabase
-        .from('group_members').select('user_id, profiles(display_name)')
-        
-      const { data: groupPreds } = await supabase
-        .from('predictions').select('*').eq('group_id', group.id)
+        .from('group_members')
+        .select('user_id, profiles(display_name)')
+        .eq('group_id', group.id)
 
-      const gRows = (members || []).map(m => {
-        const preds = groupPreds?.filter(p => p.user_id === m.user_id) || []
+      // Deduplicate members just in case
+      const uniqueMembers = [...new Map((members || []).map(m => [m.user_id, m])).values()]
+
+      const gRows = uniqueMembers.map(m => {
+        const preds = allPreds?.filter(p => p.user_id === m.user_id) || []
         const { total } = calcTotalPts(preds, sm)
         const correct = preds.filter(p => sm[p.series_key]?.winner === p.predicted_winner).length
-        return { uid: m.user_id, name: m.profiles?.display_name || 'Unknown', total, correct, isMe: m.user_id === profile.id }
+        return {
+          uid: m.user_id,
+          name: m.profiles?.display_name || 'Unknown',
+          total, correct,
+          isMe: m.user_id === profile.id,
+        }
       }).sort((a, b) => b.total - a.total)
       setGroupRows(gRows)
 
       // ── All Players Rankings ───────────────────────────────────
       const { data: allProfiles } = await supabase
         .from('profiles').select('id, display_name')
-      const { data: allPreds } = await supabase
-        .from('predictions').select('*')
 
-      const userMap = {}
-      ;(allProfiles || []).forEach(m => {
-        if (!userMap[m.id]) {
-          const preds = allPreds?.filter(p => p.user_id === m.id) || []
-          const { total } = calcTotalPts(preds, sm)
-          const correct = preds.filter(p => sm[p.series_key]?.winner === p.predicted_winner).length
-          userMap[m.id] = { uid: m.id, name: m.display_name || 'Unknown', total, correct, isMe: m.id === profile.id }
-        }
-      })
-      const pRows = Object.values(userMap).sort((a, b) => b.total - a.total)
+      const pRows = (allProfiles || []).map(m => {
+        const preds = allPreds?.filter(p => p.user_id === m.id) || []
+        const { total } = calcTotalPts(preds, sm)
+        const correct = preds.filter(p => sm[p.series_key]?.winner === p.predicted_winner).length
+        return { uid: m.id, name: m.display_name || 'Unknown', total, correct, isMe: m.id === profile.id }
+      }).sort((a, b) => b.total - a.total)
       setPlayersRows(pRows)
 
       // ── Team Rankings ─────────────────────────────────────────
@@ -53,13 +57,13 @@ export default function Rankings({ group, profile }) {
       const { data: allGroupMembers } = await supabase
         .from('group_members').select('group_id, user_id, profiles(display_name)')
 
-      const tRows = await Promise.all((allGroups || []).map(async g => {
-        const gMembers = allGroupMembers?.filter(m => m.group_id === g.id) || []
-        const { data: gPreds } = await supabase
-          .from('predictions').select('*')
+      const tRows = (allGroups || []).map(g => {
+        const gMembers = [...new Map(
+          (allGroupMembers?.filter(m => m.group_id === g.id) || []).map(m => [m.user_id, m])
+        ).values()]
 
         const activePlayers = gMembers.filter(m =>
-          gPreds?.some(p => p.user_id === m.user_id)
+          allPreds?.some(p => p.user_id === m.user_id)
         )
 
         if (activePlayers.length === 0) return {
@@ -68,15 +72,14 @@ export default function Rankings({ group, profile }) {
         }
 
         const scores = activePlayers.map(m => {
-          const preds = gPreds?.filter(p => p.user_id === m.user_id) || []
+          const preds = allPreds?.filter(p => p.user_id === m.user_id) || []
           const { total } = calcTotalPts(preds, sm)
           return total
         })
         const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
         return { id: g.id, name: g.name, playerCount: gMembers.length, activePlayers: activePlayers.length, avgScore }
-      }))
+      }).sort((a, b) => b.avgScore - a.avgScore)
 
-      tRows.sort((a, b) => b.avgScore - a.avgScore)
       setTeamsRows(tRows)
 
     } finally { setLoading(false) }
@@ -159,7 +162,7 @@ export default function Rankings({ group, profile }) {
                     <div style={{ fontFamily:'Barlow Condensed', fontWeight:700, fontSize:17,
                       color: row.id === group.id ? 'var(--purple)' : 'var(--text)',
                       overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                      {row.name} {row.id === group.id && <span style={{ fontSize:11, color:'var(--text3)', fontWeight:400 }}>(yours)</span>}
+                      {row.name}{row.id === group.id && <span style={{ fontSize:11, color:'var(--text3)', fontWeight:400 }}> (yours)</span>}
                     </div>
                     <div style={{ fontSize:11, color:'var(--text3)', marginTop:2 }}>
                       {row.playerCount} members · {row.activePlayers} with picks
@@ -206,7 +209,7 @@ function RankingList({ rows, medals }) {
             <div style={{ fontFamily:'Barlow Condensed', fontWeight:700, fontSize:17,
               color: row.isMe ? 'var(--purple)' : 'var(--text)',
               overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-              {row.name} {row.isMe && <span style={{ fontSize:11, color:'var(--text3)', fontWeight:400 }}>(me)</span>}
+              {row.name}{row.isMe && <span style={{ fontSize:11, color:'var(--text3)', fontWeight:400 }}> (me)</span>}
             </div>
             <div style={{ fontSize:11, color:'var(--text3)', marginTop:2 }}>{row.correct} correct series</div>
           </div>
