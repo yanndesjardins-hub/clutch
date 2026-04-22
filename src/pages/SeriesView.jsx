@@ -104,7 +104,7 @@ export default function SeriesView({ group, profile }) {
         predicted_games,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: "user_id,group_id,series_key,type" },
+      { onConflict: "user_id,series_key,type" },
     );
     await load();
     setModal(null);
