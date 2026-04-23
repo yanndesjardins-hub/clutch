@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import Countdown from '../components/Countdown'
+
 
 const CLUTCH_LEAGUE_NAME = 'Clutch League'
 const INSTAGRAM_URL = 'https://www.instagram.com/clutchgame.app/'
@@ -90,13 +92,16 @@ export default function GroupHub({ profile, onSelectGroup }) {
   }
 
   return (
-    <div className="page fade-up" style={{ paddingTop:40 }}>
+    <div className="page fade-up" style={{ paddingTop:20 }}>
       {/* Logo */}
       <div className="text-center" style={{ marginBottom:32 }}>
-        <img src="/clutch_logo.png" alt="Clutch" style={{ height:112, marginBottom:8 }} />
-        <p style={{ color:'var(--text3)', fontSize:13, marginTop:4 }}>
+        <img src="/clutch_logo.png" alt="Clutch" style={{ height:112, marginBottom:4 }} />
+        <p style={{ color:'var(--text3)', fontSize:13, marginTop:2, marginBottom: 20}}>
           Hey {profile?.display_name} 👋
+         
         </p>
+        <Countdown />
+
       </div>
 
       {/* Clutch League */}

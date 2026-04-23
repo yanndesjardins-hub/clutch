@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
+import Countdown from '../components/Countdown'
+
 
 const RADIO = ({ name, value, checked, onChange, label }) => (
   <label
@@ -129,17 +131,18 @@ export default function Login() {
         padding: "20px",
       }}
     >
-      <div style={{ width: "100%", maxWidth: 400 }}>
+      <div style={{ width: "100%", maxWidth: 400, paddingTop: 0 }}>
         {/* Logo */}
         <div className="text-center" style={{ marginBottom: 32 }}>
           <img
             src="/clutch_logo.png"
             alt="Clutch"
-            style={{ height: 120, marginBottom: 12 }}
+            style={{ height: 120, marginBottom: 0 }}
           />
-          <p style={{ color: "var(--text3)", fontSize: 16, letterSpacing: 2 }}>
+          <p style={{ color: "var(--text3)", fontSize: 16, letterSpacing: 2, marginBottom: 20 }}>
             PREDICT NBA PLAYOFFS 2026 🏀🔮
           </p>
+          <Countdown />
         </div>
 
         <div className="card fade-up">
