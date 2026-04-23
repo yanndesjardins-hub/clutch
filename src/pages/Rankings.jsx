@@ -152,7 +152,7 @@ export default function Rankings({ group, profile }) {
     } finally {
       setLoading(false);
     }
-  }, [group.id, profile.id]);
+  }, [group?.id, profile?.id]);
 
   useEffect(() => {
     load();

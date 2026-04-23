@@ -80,7 +80,7 @@ export default function SeriesView({ group, profile }) {
     } finally {
       setLoading(false);
     }
-  }, [group.id, profile.id]);
+  }, [group?.id, profile?.id]); // modified avec florian
 
   useEffect(() => {
     load();

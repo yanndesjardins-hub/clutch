@@ -22,6 +22,7 @@ export default function PlayoffView({ group, profile }) {
   const [error, setError] = useState(null);
 
   const load = useCallback(async () => {
+    if (!profile?.id || !group?.id) return; // modified avec florian
     try {
       const { seriesMap: sm } = await buildSeriesMap();
       setSeriesMap(sm);
@@ -40,7 +41,7 @@ export default function PlayoffView({ group, profile }) {
     } finally {
       setLoading(false);
     }
-  }, [group.id, profile.id]);
+  }, [group?.id, profile?.id]); // modified avec florian
 
   useEffect(() => {
     load();
