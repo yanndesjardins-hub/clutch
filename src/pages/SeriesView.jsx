@@ -152,7 +152,25 @@ export default function SeriesView({ group, profile }) {
     );
 
   return (
+
     <div className="page fade-up">
+
+   <div style={{
+        background: 'transparent',
+        border: '1px solid #9170ff',
+        borderRadius: 'var(--r)',
+        padding: "8px 3px",
+        marginBottom: 16,
+        textAlign: "center",
+        fontFamily: "inter",
+        fontWeight: 700,
+        letterSpacing: 0,
+        fontSize: 12,
+        color: '#9170ff',
+      }}>
+        ⏳ Series picks (semi finals) to open soon
+      </div>
+
       {ROUNDS.map(({ label, keys, round }) => {
         const seriesList = keys.map(({ key }) => ({
           key,
@@ -169,7 +187,7 @@ export default function SeriesView({ group, profile }) {
                 gap: 8,
                 marginBottom: 12,
                 paddingBottom: 8,
-                borderBottom: "1px solid rgba(245,184,65,0.2)",
+                borderBottom: '1px solid var(--text3)',
               }}
             >
               <span
@@ -179,7 +197,7 @@ export default function SeriesView({ group, profile }) {
                   fontWeight: 800,
                   letterSpacing: 3,
                   textTransform: "uppercase",
-                  color: "var(--purple)",
+                  color: "var(--text3)",
                 }}
               >
                 {label}
@@ -253,7 +271,7 @@ function SeriesCard({ series, pick, pickable, correct, wrong, onPickClick }) {
       className="card"
       style={{
         borderColor:
-          status === "active" ? "rgba(245,184,65,0.25)" : "var(--border)",
+          status === "active" ? "var(--purple-bg)" : "var(--border)",
       }}
     >
       {/* Header */}

@@ -50,7 +50,7 @@ export default function Countdown() {
 
   return (
     <div style={bannerStyle}>
-      ⏳Initial picks ends in{" "}
+      ⏳Initial picks (brackets) ends in{" "}
       {d > 0 && (
         <>
           <strong>{d} day(s)</strong>{" "}
