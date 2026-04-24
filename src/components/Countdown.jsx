@@ -40,7 +40,7 @@ export default function Countdown() {
   if (over)
     return (
       <div style={bannerStyle}>
-        🔒 First shot predictions over — Round 2 predictions to open very soon.
+        🔒Initial picks over. Round 2 picks to open very soon.
       </div>
     );
 
@@ -50,7 +50,7 @@ export default function Countdown() {
 
   return (
     <div style={bannerStyle}>
-      ⏳First shot predictions ends in{" "}
+      ⏳Initial picks ends in{" "}
       {d > 0 && (
         <>
           <strong>{d} day(s)</strong>{" "}
