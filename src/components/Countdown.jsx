@@ -28,7 +28,7 @@ export default function Countdown() {
     background: "var(--purple)",
     borderRadius: "var(--r)",
     padding: "8px 3px",
-    marginBottom: 12,
+    marginBottom: 3,
     textAlign: "center",
     fontFamily: "inter",
     fontWeight: 700,
@@ -40,7 +40,7 @@ export default function Countdown() {
   if (over)
     return (
       <div style={bannerStyle}>
-        🔒Initial picks over. Round 2 picks to open very soon.
+        🔒Initial picks over. Semifinals new picks to open very soon.
       </div>
     );
 

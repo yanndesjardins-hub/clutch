@@ -180,6 +180,19 @@ export default function PlayoffView({ group, profile }) {
     <div className="page fade-up">
       <Countdown />
 
+      <div style={{
+  textAlign: 'center',
+  marginBottom: 3,
+  padding: '6px 14px',
+  fontFamily: 'inter',
+  fontWeight: 700,
+  letterSpacing: 0,
+  fontSize: 12,
+  color: 'var(--purple)',
+}}>
+  Don't forget to complete your 15 picks up to the Finals.
+</div>
+
       {/* Conf tabs */}
       <div
         style={{
@@ -277,9 +290,9 @@ export default function PlayoffView({ group, profile }) {
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: 8,
+              
               width: 168,
-              paddingTop: 144,
+              
             }}
           >
             <div
@@ -298,6 +311,7 @@ export default function PlayoffView({ group, profile }) {
             >
               NBA Finals
             </div>
+            <div style={{ marginTop:144 }}>
             <BracketSlot
               series={finalsSeries}
               userPick={getUserPick("finals_0")}
@@ -308,6 +322,7 @@ export default function PlayoffView({ group, profile }) {
                 setModal({ seriesKey: "finals_0", series: finalsSeries })
               }
             />
+          </div>
           </div>
         </div>
       </div>
@@ -354,7 +369,7 @@ function RoundCol({
           color: "var(--text3)",
           textAlign: "center",
           paddingBottom: 6,
-          borderBottom: "1px solid var(--border)",
+          borderBottom: "1px solid var(--text3)",
           marginBottom: 2,
         }}
       >
