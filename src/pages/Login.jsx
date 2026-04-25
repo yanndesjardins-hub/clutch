@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
-import Countdown from '../components/Countdown'
-
+import Countdown from "../components/Countdown";
 
 const RADIO = ({ name, value, checked, onChange, label }) => (
   <label
@@ -139,8 +138,27 @@ export default function Login() {
             alt="Clutch"
             style={{ height: 120, marginBottom: 0 }}
           />
-          <p style={{ color: "var(--text3)", fontSize: 16, letterSpacing: 2, marginBottom: 20 }}>
-            PREDICT NBA PLAYOFFS 2026 🏀🔮
+          <p
+            style={{
+              color: "var(--text3)",
+              fontSize: 12,
+              marginTop: 0,
+              marginBottom: 25,
+              letterSpacing: 3,
+            }}
+          >
+            PREDICT NBA PLAYOFFS 2026 <br></br>AND{" "}
+            
+            <a
+              href="/prize"
+              style={{
+                color: "#9170ff",
+                textDecoration: "underline",
+                fontWeight: 700,
+              }}
+            >
+              WIN TICKETS
+            </a>
           </p>
           <Countdown />
         </div>
