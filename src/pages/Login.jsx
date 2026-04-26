@@ -26,7 +26,7 @@ const RADIO = ({ name, value, checked, onChange, label }) => (
 );
 
 export default function Login() {
-  const [mode, setMode] = useState("login");
+  const [mode, setMode] = useState("signup");
 
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
