@@ -3,7 +3,7 @@
 //     deadline. Format: 'YYYY-MM-DDTHH:MM:SS+02:00'
 //     (Paris time, UTC+2 in summer)
 // ============================================================
-export const PLAYOFF_DEADLINE = new Date('2026-04-27T19:00:00+02:00')
+export const PLAYOFF_DEADLINE = new Date('2026-04-27T23:59:59+02:00')
 
 // App branding
 export const APP_NAME = 'Clutch'
