@@ -90,10 +90,9 @@ export default function PlayoffView({ group, profile }) {
     return p?.series?.predicted_games || p?.initial?.predicted_games || null;
   }
 
-  function getCurrentPick(key, series) {
+  function getCurrentPick(key) {
     const p = predictions[key];
-    const type = series.status === "active" ? "series" : "initial";
-    return p?.[type] || null;
+    return p?.initial || null;
   }
 
   function resolveTeam(key) {
@@ -330,11 +329,11 @@ export default function PlayoffView({ group, profile }) {
       {modal && (
         <PredictionModal
           series={modal.series}
-          currentPick={getCurrentPick(modal.seriesKey, modal.series)}
+          currentPick={getCurrentPick(modal.seriesKey)}
           onSave={(pick) =>
             savePrediction({
               seriesKey: modal.seriesKey,
-              type: modal.series.status === "active" ? "series" : "initial",
+              type: "initial",
               ...pick,
             })
           }
