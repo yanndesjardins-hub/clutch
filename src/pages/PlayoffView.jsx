@@ -11,7 +11,6 @@ import BracketSlot from "../components/BracketSlot";
 import PredictionModal from "../components/PredictionModal";
 import Countdown from "../components/Countdown";
 
-const PAST_DEADLINE = new Date() > PLAYOFF_DEADLINE;
 
 export default function PlayoffView({ group, profile }) {
   const [seriesMap, setSeriesMap] = useState({});
@@ -75,8 +74,8 @@ export default function PlayoffView({ group, profile }) {
 
   function isEditable(series) {
     if (!series) return false;
+    if (new Date() > PLAYOFF_DEADLINE) return false;
     if (series.status === "finished") return false;
-    if (series.status === "upcoming") return !PAST_DEADLINE;
     return true;
   }
 
