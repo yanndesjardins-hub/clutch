@@ -57,14 +57,13 @@ create table if not exists group_members (
 create table if not exists predictions (
   id               uuid primary key default gen_random_uuid(),
   user_id          uuid references profiles(id) on delete cascade,
-  group_id         uuid references groups(id) on delete cascade,
   series_key       text not null,
   type             text not null check (type in ('initial', 'series')),
   predicted_winner text,                -- abbr de l'équipe (ex: 'BOS')
   predicted_games  int  check (predicted_games between 4 and 7),
   created_at       timestamptz default now(),
   updated_at       timestamptz default now(),
-  unique(user_id, group_id, series_key, type)
+  unique(user_id, series_key, type)
 );
 
 -- ══════════════════════════════════════════════════════════════════════
@@ -91,9 +90,9 @@ create policy "members_select" on group_members for select
   using (group_id in (select group_id from group_members where user_id = auth.uid()));
 create policy "members_insert" on group_members for insert with check (auth.role() = 'authenticated');
 
--- predictions : visibles par les membres du groupe, modifiables par le propriétaire
+-- predictions : visibles par tous les users connectés (pour leaderboard global), modifiables par le propriétaire
 create policy "predictions_select" on predictions for select
-  using (group_id in (select group_id from group_members where user_id = auth.uid()));
+  using (auth.role() = 'authenticated');
 create policy "predictions_insert" on predictions for insert
   with check (auth.uid() = user_id);
 create policy "predictions_update" on predictions for update
@@ -105,6 +104,5 @@ create policy "predictions_update" on predictions for update
 create index if not exists idx_group_members_user    on group_members(user_id);
 create index if not exists idx_group_members_group   on group_members(group_id);
 create index if not exists idx_predictions_user      on predictions(user_id);
-create index if not exists idx_predictions_group     on predictions(group_id);
 create index if not exists idx_predictions_series    on predictions(series_key);
 create index if not exists idx_groups_invite_code    on groups(invite_code);
