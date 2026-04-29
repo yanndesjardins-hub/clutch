@@ -13,7 +13,7 @@ export const APP_COLOR_HOVER = '#c3a5ff'
 // ─── Teams ────────────────────────────────────────────────────────────────────
 export const TEAMS = {
   east: [
-    { seed: 1, name: 'Detroit Pistons',    abbr: 'DET', color: '#C8102E', emoji: '🔴' },
+    { seed: 1, name: 'Detroit Pistons',    abbr: 'DET', color: '#C8102E', emoji: '🚘' },
     { seed: 2, name: 'Boston Celtics',     abbr: 'BOS', color: '#007A33', emoji: '🍀' },
     { seed: 3, name: 'New York Knicks',    abbr: 'NYK', color: '#F58426', emoji: '🗽' },
     { seed: 4, name: 'Cleveland Cavaliers',abbr: 'CLE', color: '#860038', emoji: '⚔️' },

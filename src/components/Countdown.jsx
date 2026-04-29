@@ -40,7 +40,7 @@ export default function Countdown() {
   if (over)
     return (
       <div style={bannerStyle}>
-        🔒Initial picks over. Semifinals new picks to open very soon.
+        🔒Initial picks over. Semifinals new picks to open very soon in the "Series" tab.
       </div>
     );
 

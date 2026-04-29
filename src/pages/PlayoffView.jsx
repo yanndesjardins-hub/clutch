@@ -178,19 +178,6 @@ export default function PlayoffView({ group, profile }) {
     <div className="page fade-up">
       <Countdown />
 
-      <div style={{
-  textAlign: 'center',
-  marginBottom: 3,
-  padding: '6px 14px',
-  fontFamily: 'inter',
-  fontWeight: 700,
-  letterSpacing: 0,
-  fontSize: 12,
-  color: 'var(--purple)',
-}}>
-  Don't forget to complete your 15 picks up to the Finals.
-</div>
-
       {/* Conf tabs */}
       <div
         style={{
