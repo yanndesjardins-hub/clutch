@@ -33,28 +33,37 @@ export function calcTotalPts(predictions, seriesMap) {
     breakdown[p.series_key] += pts
   })
 
-  // Conference finalist bonus
+  // Conference finalist bonus (initial picks only)
   ;['east_r3_0', 'west_r3_0'].forEach(key => {
     const s = seriesMap[key]
     if (!s?.winner) return
-    const correct = predictions.some(p => p.series_key === key && p.predicted_winner === s.winner)
+    const correct = predictions.some(
+      p => p.series_key === key && p.type === 'initial' && p.predicted_winner === s.winner
+    )
     if (correct) {
       total += SCORING.confFinalist
       breakdown['_confFinalist'] = (breakdown['_confFinalist'] || 0) + SCORING.confFinalist
     }
   })
 
-  // NBA finalist and champion bonus
+  // NBA finalist and champion bonus (initial picks only)
   const finals = seriesMap['finals_0']
   if (finals?.winner) {
-    const preds = predictions.filter(p => p.series_key === 'finals_0')
-    const champPred = preds.find(p => p.predicted_winner === finals.winner)
-    if (champPred) {
-      total += SCORING.champion
-      breakdown['_champion'] = SCORING.champion
-    } else if (preds.length > 0) {
-      total += SCORING.finalist
-      breakdown['_finalist'] = SCORING.finalist
+    const initialFinalsPred = predictions.find(
+      p => p.series_key === 'finals_0' && p.type === 'initial'
+    )
+    if (initialFinalsPred) {
+      const finalistTeams = [
+        seriesMap['east_r3_0']?.winner,
+        seriesMap['west_r3_0']?.winner,
+      ].filter(Boolean)
+      if (initialFinalsPred.predicted_winner === finals.winner) {
+        total += SCORING.champion
+        breakdown['_champion'] = SCORING.champion
+      } else if (finalistTeams.includes(initialFinalsPred.predicted_winner)) {
+        total += SCORING.finalist
+        breakdown['_finalist'] = SCORING.finalist
+      }
     }
   }
 
