@@ -24,7 +24,7 @@ export const TEAMS = {
   ],
   west: [
     { seed: 1, name: 'OKC Thunder',        abbr: 'OKC', color: '#007AC1', emoji: '⚡' },
-    { seed: 2, name: 'San Antonio Spurs',  abbr: 'SAS', color: '#C4CED4', emoji: '🤠' },
+    { seed: 2, name: 'San Antonio Spurs',  abbr: 'SAS', color: '#C4CED4', emoji: '👽' },
     { seed: 3, name: 'Denver Nuggets',     abbr: 'DEN', color: '#FEC524', emoji: '⛰️' },
     { seed: 4, name: 'LA Lakers',          abbr: 'LAL', color: '#552583', emoji: '👑' },
     { seed: 5, name: 'Houston Rockets',    abbr: 'HOU', color: '#CE1141', emoji: '🚀' },
