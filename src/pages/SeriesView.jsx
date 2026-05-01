@@ -3,6 +3,7 @@ import { BRACKET, TEAMS, TEAM_BY_ABBR } from "../lib/constants";
 import { buildSeriesMap } from "../lib/nbaApi";
 import { supabase } from "../lib/supabase";
 import PredictionModal from "../components/PredictionModal";
+import Countdown from "../components/Countdown";
 
 // Format the "Game 1 in X days" / "Game 1 today" indicator
 function formatGame1(game1Date) {
@@ -166,22 +167,7 @@ export default function SeriesView({ group, profile }) {
   return (
 
     <div className="page fade-up">
-
-   <div style={{
-        background: 'transparent',
-        border: '1px solid #9170ff',
-        borderRadius: 'var(--r)',
-        padding: "8px 3px",
-        marginBottom: 16,
-        textAlign: "center",
-        fontFamily: "inter",
-        fontWeight: 700,
-        letterSpacing: 0,
-        fontSize: 12,
-        color: '#9170ff',
-      }}>
-        ⏳ Series picks (semi finals) to open soon
-      </div>
+      <Countdown />
 
       {ROUNDS.map(({ label, keys, round }) => {
         const seriesList = keys.map(({ key }) => ({
@@ -314,7 +300,7 @@ function SeriesCard({ series, pick, pickable, correct, wrong, onPickClick }) {
         </span>
         {pickable && (
           <button className="btn btn-ghost btn-sm" onClick={onPickClick}>
-            {pick ? "✏️ Edit pick" : "+ Add pick"}
+            {pick ? "Edit pick" : "+ Add pick"}
           </button>
         )}
       </div>
@@ -421,7 +407,7 @@ function SeriesCard({ series, pick, pickable, correct, wrong, onPickClick }) {
             color: "var(--purple)",
           }}
         >
-          👆 👆 No pick yet
+          No pick yet
         </div>
       )}
     </div>

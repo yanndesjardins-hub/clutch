@@ -36,7 +36,7 @@ export default function PredictionModal({ series, currentPick, onSave, onClose }
       }}>
         {/* Header */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
-          <h3 className="condensed" style={{ fontSize:20, fontWeight:800, letterSpacing:2 }}>🏀 YOUR PICK</h3>
+          <h3 className="condensed" style={{ fontSize:20, fontWeight:800, letterSpacing:2 }}>YOUR PICK</h3>
           <button onClick={onClose}
             style={{ background:'none', border:'none', color:'var(--text3)', fontSize:24, cursor:'pointer', lineHeight:1, padding:0 }}>
             ✕
