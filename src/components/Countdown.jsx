@@ -40,7 +40,7 @@ export default function Countdown() {
   if (over)
     return (
       <div style={bannerStyle}>
-        🏀 Semifinals picks now open !
+        Semi finals picks now open ! (in the "Series" tab)
       </div>
     );
 
