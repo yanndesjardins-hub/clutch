@@ -31,6 +31,16 @@ function computeSeriesFromGames(games, abbrA, abbrB) {
     return abbrs.includes(abbrA) && abbrs.includes(abbrB);
   });
 
+  // Earliest scheduled game date (Game 1) — used to display "Game 1 in X days"
+  let game1Date = null;
+  if (sg.length) {
+    const dates = sg
+      .map((g) => g.date || g.start_time || g.scheduled_at)
+      .filter(Boolean)
+      .sort();
+    if (dates.length) game1Date = dates[0];
+  }
+
   if (!sg.length)
     return {
       status: "upcoming",
@@ -39,28 +49,45 @@ function computeSeriesFromGames(games, abbrA, abbrB) {
       gamesPlayed: 0,
       winner: null,
       actualGames: null,
+      game1Date: null,
     };
 
   let winsA = 0,
-    winsB = 0;
+    winsB = 0,
+    playedCount = 0;
   sg.forEach((g) => {
     const hs = g.home_team_score,
       vs = g.visitor_team_score;
     if (!hs || !vs) return;
+    playedCount++;
     const homeWon = hs > vs;
     const aIsHome = g.home_team.abbreviation === abbrA;
     if (homeWon) aIsHome ? winsA++ : winsB++;
     else aIsHome ? winsB++ : winsA++;
   });
 
+  // Series is "upcoming" until at least one game has actually been played
+  if (playedCount === 0) {
+    return {
+      status: "upcoming",
+      winsA: 0,
+      winsB: 0,
+      gamesPlayed: 0,
+      winner: null,
+      actualGames: null,
+      game1Date,
+    };
+  }
+
   const done = winsA === 4 || winsB === 4;
   return {
     status: done ? "finished" : "active",
     winsA,
     winsB,
-    gamesPlayed: sg.length,
+    gamesPlayed: playedCount,
     winner: done ? (winsA === 4 ? abbrA : abbrB) : null,
-    actualGames: done ? sg.length : null,
+    actualGames: done ? playedCount : null,
+    game1Date,
   };
 }
 
@@ -96,6 +123,7 @@ export async function buildSeriesMap() {
               gamesPlayed: 0,
               winner: null,
               actualGames: null,
+              game1Date: null,
             };
 
       if (seriesData.winner) realWinners[slot.key] = seriesData.winner;
@@ -123,6 +151,7 @@ export async function buildSeriesMap() {
           gamesPlayed: 0,
           winner: null,
           actualGames: null,
+          game1Date: null,
         };
   if (fData.winner) realWinners[fSlot.key] = fData.winner;
   result[fSlot.key] = {

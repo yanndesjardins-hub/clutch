@@ -4,6 +4,18 @@ import { buildSeriesMap } from "../lib/nbaApi";
 import { supabase } from "../lib/supabase";
 import PredictionModal from "../components/PredictionModal";
 
+// Format the "Game 1 in X days" / "Game 1 today" indicator
+function formatGame1(game1Date) {
+  if (!game1Date) return null;
+  const date = new Date(game1Date);
+  if (isNaN(date.getTime())) return null;
+  const diff = date - new Date();
+  if (diff <= 0) return null;
+  const days = Math.floor(diff / 86400000);
+  if (days >= 1) return `Game 1 in ${days} day${days > 1 ? "s" : ""}`;
+  return "Game 1 today";
+}
+
 // All series keys in display order, grouped by round
 const ROUNDS = [
   {
@@ -251,7 +263,8 @@ export default function SeriesView({ group, profile }) {
 // ── Series Card ───────────────────────────────────────────────────────────────
 function SeriesCard({ series, pick, pickable, correct, wrong, onPickClick }) {
   const { teamA, teamB, status, winsA, winsB, winner } = series;
-  const isTBD = !teamA || !teamB;
+  const eitherTBD = !teamA || !teamB;
+  const game1Indicator = status === "upcoming" ? formatGame1(series.game1Date) : null;
 
   const statusColor =
     status === "active"
@@ -266,14 +279,18 @@ function SeriesCard({ series, pick, pickable, correct, wrong, onPickClick }) {
         ? "✅ Done"
         : "⏳ Upcoming";
 
+  // Card visual state: pickable (open prono) > active > default
+  const cardStyle = pickable
+    ? {
+        borderColor: "#9170ff",
+        background: "rgba(145, 112, 255, 0.2)",
+      }
+    : status === "active"
+      ? { borderColor: "#9170ff" }
+      : {};
+
   return (
-    <div
-      className="card"
-      style={{
-        borderColor:
-          status === "active" ? "var(--purple-bg)" : "var(--border)",
-      }}
-    >
+    <div className="card" style={cardStyle}>
       {/* Header */}
       <div
         style={{
@@ -302,53 +319,64 @@ function SeriesCard({ series, pick, pickable, correct, wrong, onPickClick }) {
         )}
       </div>
 
-      {/* Teams + score */}
-      {isTBD ? (
+      {/* Game 1 indicator (centered, above the score row) */}
+      {game1Indicator && (
         <div
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "8px 0",
+            textAlign: "center",
+            marginBottom: 6,
+            fontFamily: "Barlow Condensed",
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: 1.5,
+            textTransform: "uppercase",
+            color: "var(--text3)",
           }}
         >
-          <TBDPill />
-          <span style={{ color: "var(--text3)", fontSize: 12 }}>VS</span>
-          <TBDPill right />
+          {game1Indicator}
         </div>
-      ) : (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+      )}
+
+      {/* Teams + score */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        {teamA ? (
           <TeamPill
             team={teamA}
             isWinner={winner === teamA.abbr}
             isPicked={pick?.predicted_winner === teamA.abbr}
           />
-          <div style={{ textAlign: "center", padding: "0 8px", minWidth: 60 }}>
-            {status !== "upcoming" ? (
-              <span
-                className="condensed"
-                style={{ fontSize: 24, fontWeight: 900, color: "var(--text2)" }}
-              >
-                {winsA} – {winsB}
-              </span>
-            ) : (
-              <span style={{ color: "var(--text3)", fontSize: 12 }}>VS</span>
-            )}
-          </div>
+        ) : (
+          <TBDPill />
+        )}
+        <div style={{ textAlign: "center", padding: "0 8px", minWidth: 60 }}>
+          {!eitherTBD && status !== "upcoming" ? (
+            <span
+              className="condensed"
+              style={{ fontSize: 24, fontWeight: 900, color: "var(--text2)" }}
+            >
+              {winsA} – {winsB}
+            </span>
+          ) : (
+            <span style={{ color: "var(--text3)", fontSize: 12 }}>VS</span>
+          )}
+        </div>
+        {teamB ? (
           <TeamPill
             team={teamB}
             isWinner={winner === teamB.abbr}
             isPicked={pick?.predicted_winner === teamB.abbr}
             right
           />
-        </div>
-      )}
+        ) : (
+          <TBDPill right />
+        )}
+      </div>
 
       {/* My pick */}
       {pick && (
@@ -445,7 +473,16 @@ function TBDPill({ right }) {
         gap: 6,
       }}
     >
-      <span style={{ fontSize: 22 }}>❓</span>
+      <span
+        style={{
+          fontSize: 22,
+          fontWeight: 800,
+          color: "var(--text3)",
+          lineHeight: 1,
+        }}
+      >
+        ?
+      </span>
       <div style={{ textAlign: right ? "right" : "left" }}>
         <div
           className="condensed"
