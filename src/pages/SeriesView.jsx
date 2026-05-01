@@ -122,10 +122,10 @@ export default function SeriesView({ group, profile }) {
     setModal(null);
   }
 
-  // Best pick for a series (series pick > initial pick)
+  // Pick on a series — series picks only (initial picks belong to PlayoffView)
   function getBestPick(key) {
     const p = predictions[key];
-    return p?.series || p?.initial || null;
+    return p?.series || null;
   }
 
   // Get series data — for R1, always show from constants
