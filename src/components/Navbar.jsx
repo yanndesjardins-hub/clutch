@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+import { buildSeriesMap } from "../lib/nbaApi";
 
 function TrophyIcon({ color }) {
   return (
@@ -126,9 +129,10 @@ const TABS = [
 const PURPLE = "#9170ff";
 const GRAY = "#aaaaaa";
 
-export default function Navbar({ group, onLeave }) {
+export default function Navbar({ group, onLeave, profile }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const badges = useNavBadges(profile?.id, pathname);
 
   return (
     <>
@@ -190,6 +194,9 @@ export default function Navbar({ group, onLeave }) {
         {TABS.map(({ path, Icon, label }) => {
           const active = pathname === path;
           const color = active ? PURPLE : GRAY;
+          const showBadge =
+            (path === "/group/series" && badges.series) ||
+            (path === "/group/specials" && badges.specials);
           return (
             <button
               key={path}
@@ -211,7 +218,22 @@ export default function Navbar({ group, onLeave }) {
                 padding: "6px 0",
               }}
             >
-              <Icon color={color} />
+              <span style={{ position: "relative", display: "inline-flex" }}>
+                <Icon color={color} />
+                {showBadge && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: -1,
+                      right: -1,
+                      width: 5,
+                      height: 5,
+                      background: "#ff3b30",
+                      borderRadius: "50%",
+                    }}
+                  />
+                )}
+              </span>
               <span
                 style={{
                   fontFamily: "Barlow Condensed",
@@ -220,22 +242,9 @@ export default function Navbar({ group, onLeave }) {
                   letterSpacing: 1,
                   textTransform: "uppercase",
                   color,
-                  position: "relative",
                 }}
               >
                 {label}
-
-                {/* <span
-                  style={{
-                    position: "absolute",
-                    top: `-28px`,
-                    right: `-2px`,
-                    width: `10px`,
-                    height: `10px`,
-                    backgroundColor: "red",
-                    borderRadius: `100%`,
-                  }}
-                ></span> */}
               </span>
             </button>
           );
@@ -246,4 +255,63 @@ export default function Navbar({ group, onLeave }) {
       <div style={{ height: 48 }} />
     </>
   );
+}
+
+// Returns flags telling which tabs should show a notification dot
+function useNavBadges(profileId, pathname) {
+  const [badges, setBadges] = useState({ series: false, specials: false });
+
+  useEffect(() => {
+    if (!profileId) return;
+    let alive = true;
+    (async () => {
+      try {
+        const [
+          { seriesMap },
+          { data: userSeriesPicks },
+          { data: openQs },
+          { data: userAns },
+        ] = await Promise.all([
+          buildSeriesMap(),
+          supabase
+            .from("predictions")
+            .select("series_key")
+            .eq("user_id", profileId)
+            .eq("type", "series"),
+          supabase
+            .from("special_questions")
+            .select("id, deadline, correct_choice")
+            .gt("deadline", new Date().toISOString())
+            .is("correct_choice", null),
+          supabase
+            .from("special_answers")
+            .select("question_id")
+            .eq("user_id", profileId),
+        ]);
+
+        // Series badge: any pickable upcoming R2+ series without a series pick
+        const pickedKeys = new Set((userSeriesPicks || []).map((p) => p.series_key));
+        const seriesPending = Object.entries(seriesMap || {}).some(([key, s]) => {
+          if (key.includes("_r1_")) return false;
+          if (!s.teamA || !s.teamB) return false;
+          if (s.status !== "upcoming") return false;
+          return !pickedKeys.has(key);
+        });
+
+        // Specials badge: any open question without an answer
+        const answered = new Set((userAns || []).map((a) => a.question_id));
+        const specialsPending = (openQs || []).some((q) => !answered.has(q.id));
+
+        if (alive)
+          setBadges({ series: seriesPending, specials: specialsPending });
+      } catch {
+        // silent — badges are best-effort
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [profileId, pathname]);
+
+  return badges;
 }

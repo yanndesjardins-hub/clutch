@@ -42,7 +42,7 @@ function GroupLayout({ group, onLeave, profile }) {
   return (
     <>
       <Outlet context={{ group, profile }} />
-      <Navbar group={group} onLeave={onLeave} />
+      <Navbar group={group} onLeave={onLeave} profile={profile} />
     </>
   );
 }
