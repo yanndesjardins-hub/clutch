@@ -28,7 +28,7 @@ export default function Countdown() {
     background: "var(--purple)",
     borderRadius: "var(--r)",
     padding: "8px 3px",
-    marginBottom: 3,
+    marginBottom: 16,
     textAlign: "center",
     fontFamily: "inter",
     fontWeight: 700,
