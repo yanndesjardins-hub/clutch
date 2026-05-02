@@ -75,7 +75,7 @@ export const BRACKET = {
 // ─── Scoring ──────────────────────────────────────────────────────────────────
 export const SCORING = {
   initial: { winner: 5, gamesBonus: 10 }, // 5 + 10 = 15 max
-  series:  { winner: 3, gamesBonus: 6  }, // 3 + 6  = 9 max
+  series:  { winner: 4, gamesBonus: 8  }, // 4 + 8  = 12 max
   confFinalist: 10,
   finalist:     20,
   champion:     50,

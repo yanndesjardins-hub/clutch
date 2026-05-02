@@ -54,11 +54,11 @@ export default function Rules() {
           <strong>update your pick</strong> for that matchup. Points stack with
           your initial picks.
         </p>
-        <ScoreRow label="Correct series winner" pts="3 pts" />
+        <ScoreRow label="Correct series winner" pts="4 pts" />
         <ScoreRow
           label="Correct number of games"
-          pts="+6 pts"
-          sub="3 + 6 = 9 pts max per series"
+          pts="+8 pts"
+          sub="4 + 8 = 12 pts max per series"
         />
         <p style={{ color: "var(--text3)", fontSize: 12, marginTop: 8 }}>
           💡 This lets you correct a wrong initial pick — but earns fewer
@@ -69,8 +69,8 @@ export default function Rules() {
       <Section emoji="📊" title="Points Stack">
         <p>
           Initial picks and series picks <strong>stack together</strong>. Pick
-          the right winner upfront (5 pts) and confirm it at series start (3
-          pts) = <strong>8 pts</strong> for that winner.
+          the right winner upfront (5 pts) and confirm it at series start (4
+          pts) = <strong>9 pts</strong> for that winner.
         </p>
       </Section>
 
@@ -105,7 +105,7 @@ export default function Rules() {
           className="condensed"
           style={{ fontSize: 48, fontWeight: 900, color: "var(--purple)" }}
         >
-          {15 * 15 + 9 * 7 + 10 * 2 + 20 + 50}
+          {15 * 15 + 12 * 7 + 10 * 2 + 20 + 50}
         </div>
         <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 4 }}>
           points (nearly impossible 😅)
