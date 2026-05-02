@@ -19,6 +19,7 @@ import Account from "./pages/Account";
 import Terms from "./pages/Terms";
 import ResetPassword from "./pages/ResetPassword";
 import Prize from "./pages/Prize";
+import Specials from "./pages/Specials";
 import Navbar from "./components/Navbar";
 
 function Loader() {
@@ -146,6 +147,10 @@ export default function App() {
         <Route
           path="series"
           element={<SeriesView group={activeGroup} profile={profile} />}
+        />
+        <Route
+          path="specials"
+          element={<Specials profile={profile} />}
         />
         <Route
           path="rankings"

@@ -69,3 +69,18 @@ export function calcTotalPts(predictions, seriesMap) {
 
   return { total, breakdown }
 }
+
+// ─── Special questions points ────────────────────────────────────────────────
+// answers   : [{ question_id, choice }]
+// questions : [{ id, points, correct_choice }]
+export function calcSpecialPts(answers, questions) {
+  if (!answers?.length || !questions?.length) return 0
+  const qById = new Map(questions.map(q => [q.id, q]))
+  let total = 0
+  answers.forEach(a => {
+    const q = qById.get(a.question_id)
+    if (!q || q.correct_choice == null) return
+    if (a.choice === q.correct_choice) total += q.points
+  })
+  return total
+}

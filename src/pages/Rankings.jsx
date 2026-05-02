@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabase";
 import { buildSeriesMap } from "../lib/nbaApi";
-import { calcTotalPts } from "../lib/scoring";
+import { calcTotalPts, calcSpecialPts } from "../lib/scoring";
 import { BRACKET } from "../lib/constants";
 
 // All series keys across all rounds
@@ -33,8 +33,16 @@ export default function Rankings({ group, profile }) {
         return s?.teamA && s?.teamB;
       });
       setTotalPickable(ALL_SERIES_KEYS.length);
-      // All predictions
-      const { data: allPreds } = await supabase.from("predictions").select("*");
+      // All predictions + special questions/answers (for total scoring)
+      const [
+        { data: allPreds },
+        { data: allSpecialQuestions },
+        { data: allSpecialAnswers },
+      ] = await Promise.all([
+        supabase.from("predictions").select("*"),
+        supabase.from("special_questions").select("id, points, correct_choice"),
+        supabase.from("special_answers").select("user_id, question_id, choice"),
+      ]);
 
       // Helper: count unique series picked by a user
       function countPicks(preds) {
@@ -52,10 +60,19 @@ export default function Rankings({ group, profile }) {
         ...new Map((members || []).map((m) => [m.user_id, m])).values(),
       ];
 
+      // Helper: total = predictions points + specials points
+      function totalFor(userId) {
+        const preds = allPreds?.filter((p) => p.user_id === userId) || [];
+        const specs =
+          allSpecialAnswers?.filter((a) => a.user_id === userId) || [];
+        const predPts = calcTotalPts(preds, sm).total;
+        const specPts = calcSpecialPts(specs, allSpecialQuestions || []);
+        return { total: predPts + specPts, preds };
+      }
+
       const gRows = uniqueMembers
         .map((m) => {
-          const preds = allPreds?.filter((p) => p.user_id === m.user_id) || [];
-          const { total } = calcTotalPts(preds, sm);
+          const { total, preds } = totalFor(m.user_id);
           const correct = preds.filter(
             (p) => sm[p.series_key]?.winner === p.predicted_winner,
           ).length;
@@ -79,8 +96,7 @@ export default function Rankings({ group, profile }) {
 
       const pRows = (allProfiles || [])
         .map((m) => {
-          const preds = allPreds?.filter((p) => p.user_id === m.id) || [];
-          const { total } = calcTotalPts(preds, sm);
+          const { total, preds } = totalFor(m.id);
           const correct = preds.filter(
             (p) => sm[p.series_key]?.winner === p.predicted_winner,
           ).length;
@@ -129,12 +145,7 @@ export default function Rankings({ group, profile }) {
               activePlayers: 0,
             };
 
-          const scores = activePlayers.map((m) => {
-            const preds =
-              allPreds?.filter((p) => p.user_id === m.user_id) || [];
-            const { total } = calcTotalPts(preds, sm);
-            return total;
-          });
+          const scores = activePlayers.map((m) => totalFor(m.user_id).total);
           const avgScore = Math.round(
             scores.reduce((a, b) => a + b, 0) / scores.length,
           );
