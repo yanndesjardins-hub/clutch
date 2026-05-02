@@ -246,11 +246,9 @@ function QuestionCard({ question, userAnswer, status, onAnswerClick }) {
           style={{
             textAlign: "center",
             marginBottom: 8,
-            fontFamily: "Barlow Condensed",
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: 1.5,
-            textTransform: "uppercase",
+            fontFamily: "inter",
+            fontSize: 12,
+            fontWeight: 500,
             color: "var(--text3)",
           }}
         >

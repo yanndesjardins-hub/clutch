@@ -300,11 +300,9 @@ function SeriesCard({ series, pick, pickable, correct, wrong, onPickClick }) {
           style={{
             textAlign: "center",
             marginBottom: 6,
-            fontFamily: "Barlow Condensed",
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: 1.5,
-            textTransform: "uppercase",
+            fontFamily: "inter",
+            fontSize: 12,
+            fontWeight: 500,
             color: "var(--text3)",
           }}
         >
