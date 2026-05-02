@@ -224,10 +224,10 @@ export default function Navbar({ group, onLeave, profile }) {
                   <span
                     style={{
                       position: "absolute",
-                      top: -1,
-                      right: -1,
-                      width: 5,
-                      height: 5,
+                      top: -2,
+                      right: -2,
+                      width: 10,
+                      height: 10,
                       background: "#ff3b30",
                       borderRadius: "50%",
                     }}
