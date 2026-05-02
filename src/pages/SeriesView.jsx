@@ -4,18 +4,7 @@ import { buildSeriesMap } from "../lib/nbaApi";
 import { supabase } from "../lib/supabase";
 import PredictionModal from "../components/PredictionModal";
 import Countdown from "../components/Countdown";
-
-// Format the "Game 1 in X days" / "Game 1 today" indicator
-function formatGame1(game1Date) {
-  if (!game1Date) return null;
-  const date = new Date(game1Date);
-  if (isNaN(date.getTime())) return null;
-  const diff = date - new Date();
-  if (diff <= 0) return null;
-  const days = Math.floor(diff / 86400000);
-  if (days >= 1) return `Game 1 in ${days} day${days > 1 ? "s" : ""}`;
-  return "Game 1 today";
-}
+import Chrono from "../components/Chrono";
 
 // All series keys in display order, grouped by round
 const ROUNDS = [
@@ -250,7 +239,7 @@ export default function SeriesView({ group, profile }) {
 function SeriesCard({ series, pick, pickable, correct, wrong, onPickClick }) {
   const { teamA, teamB, status, winsA, winsB, winner } = series;
   const eitherTBD = !teamA || !teamB;
-  const game1Indicator = status === "upcoming" ? formatGame1(series.game1Date) : null;
+  const showChrono = status === "upcoming" && series.game1Date;
 
   const statusColor =
     status === "active"
@@ -305,8 +294,8 @@ function SeriesCard({ series, pick, pickable, correct, wrong, onPickClick }) {
         )}
       </div>
 
-      {/* Game 1 indicator (centered, above the score row) */}
-      {game1Indicator && (
+      {/* Game 1 chrono (centered, above the score row) */}
+      {showChrono && (
         <div
           style={{
             textAlign: "center",
@@ -319,7 +308,7 @@ function SeriesCard({ series, pick, pickable, correct, wrong, onPickClick }) {
             color: "var(--text3)",
           }}
         >
-          {game1Indicator}
+          <Chrono targetDate={series.game1Date} prefix="Game 1 in" />
         </div>
       )}
 

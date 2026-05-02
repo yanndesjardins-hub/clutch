@@ -1,21 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabase";
 import Countdown from "../components/Countdown";
+import Chrono from "../components/Chrono";
 import SpecialAnswerModal from "../components/SpecialAnswerModal";
-
-// "Closes in X days" / "Closes in X hours" / "Closes today"
-function formatDeadline(deadline) {
-  if (!deadline) return null;
-  const date = new Date(deadline);
-  if (isNaN(date.getTime())) return null;
-  const diff = date - new Date();
-  if (diff <= 0) return "Deadline passed";
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor((diff % 86400000) / 3600000);
-  if (days >= 1) return `Closes in ${days} day${days > 1 ? "s" : ""}`;
-  if (hours >= 1) return `Closes in ${hours} hour${hours > 1 ? "s" : ""}`;
-  return "Closes very soon";
-}
 
 // Question lifecycle: open / closed / resolved
 function getStatus(q) {
@@ -253,7 +240,7 @@ function QuestionCard({ question, userAnswer, status, onAnswerClick }) {
         )}
       </div>
 
-      {/* Deadline indicator (open only) */}
+      {/* Deadline chrono (open only) */}
       {isOpen && (
         <div
           style={{
@@ -267,7 +254,7 @@ function QuestionCard({ question, userAnswer, status, onAnswerClick }) {
             color: "var(--text3)",
           }}
         >
-          {formatDeadline(question.deadline)}
+          <Chrono targetDate={question.deadline} prefix="Closes in" />
         </div>
       )}
 
