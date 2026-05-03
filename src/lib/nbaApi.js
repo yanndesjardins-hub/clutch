@@ -32,10 +32,22 @@ function computeSeriesFromGames(games, abbrA, abbrB) {
   });
 
   // Earliest scheduled game date (Game 1) — used to display "Game 1 in X days"
+  // Prefer g.datetime (full ISO UTC). Fallback to g.status when it looks like
+  // an ISO datetime (scheduled games). Avoid g.date — it's date-only and gets
+  // parsed as midnight UTC, off by hours from the real game time.
   let game1Date = null;
   if (sg.length) {
     const dates = sg
-      .map((g) => g.date || g.start_time || g.scheduled_at)
+      .map((g) => {
+        if (g.datetime) return g.datetime;
+        if (
+          typeof g.status === "string" &&
+          /^\d{4}-\d{2}-\d{2}T/.test(g.status)
+        ) {
+          return g.status;
+        }
+        return null;
+      })
       .filter(Boolean)
       .sort();
     if (dates.length) game1Date = dates[0];

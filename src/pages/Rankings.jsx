@@ -21,19 +21,13 @@ export default function Rankings({ group, profile }) {
   const [groupRows, setGroupRows] = useState([]);
   const [playersRows, setPlayersRows] = useState([]);
   const [teamsRows, setTeamsRows] = useState([]);
-  const [totalPickable, setTotalPickable] = useState(0);
+  const [maxActions, setMaxActions] = useState(0);
 
   const load = useCallback(async () => {
     try {
       const { seriesMap: sm } = await buildSeriesMap();
 
-      // Count series where both teams are known = pickable
-      const pickableKeys = ALL_SERIES_KEYS.filter((key) => {
-        const s = sm[key];
-        return s?.teamA && s?.teamB;
-      });
-      setTotalPickable(ALL_SERIES_KEYS.length);
-      // All predictions + special questions/answers (for total scoring)
+      // All predictions + special questions/answers
       const [
         { data: allPreds },
         { data: allSpecialQuestions },
@@ -44,11 +38,17 @@ export default function Rankings({ group, profile }) {
         supabase.from("special_answers").select("user_id, question_id, choice"),
       ]);
 
-      // Helper: count unique series picked by a user
-      function countPicks(preds) {
-        const uniqueSeries = new Set(preds.map((p) => p.series_key));
-        return uniqueSeries.size;
-      }
+      // Max actions possible right now:
+      //  - 15 initial picks (whole bracket — open before deadline, locked after)
+      //  - N R2+ series whose teams are known (series-pick window past or open)
+      //  - all special questions in DB (open + closed + resolved)
+      const knownR2plusCount = ALL_SERIES_KEYS.filter((key) => {
+        if (key.includes("_r1_")) return false;
+        const s = sm[key];
+        return s?.teamA && s?.teamB;
+      }).length;
+      const totalQuestions = (allSpecialQuestions || []).length;
+      setMaxActions(15 + knownR2plusCount + totalQuestions);
 
       // ── Your Team ─────────────────────────────────────────────
       const { data: members } = await supabase
@@ -67,22 +67,22 @@ export default function Rankings({ group, profile }) {
           allSpecialAnswers?.filter((a) => a.user_id === userId) || [];
         const predPts = calcTotalPts(preds, sm).total;
         const specPts = calcSpecialPts(specs, allSpecialQuestions || []);
-        return { total: predPts + specPts, preds };
+        return { total: predPts + specPts, preds, specs };
       }
 
       const gRows = uniqueMembers
         .map((m) => {
-          const { total, preds } = totalFor(m.user_id);
+          const { total, preds, specs } = totalFor(m.user_id);
           const correct = preds.filter(
             (p) => sm[p.series_key]?.winner === p.predicted_winner,
           ).length;
-          const picks = countPicks(preds);
+          const actions = preds.length + specs.length;
           return {
             uid: m.user_id,
             name: m.profiles?.display_name || "Unknown",
             total,
             correct,
-            picks,
+            actions,
             isMe: m.user_id === profile.id,
           };
         })
@@ -96,17 +96,17 @@ export default function Rankings({ group, profile }) {
 
       const pRows = (allProfiles || [])
         .map((m) => {
-          const { total, preds } = totalFor(m.id);
+          const { total, preds, specs } = totalFor(m.id);
           const correct = preds.filter(
             (p) => sm[p.series_key]?.winner === p.predicted_winner,
           ).length;
-          const picks = countPicks(preds);
+          const actions = preds.length + specs.length;
           return {
             uid: m.id,
             name: m.display_name || "Unknown",
             total,
             correct,
-            picks,
+            actions,
             isMe: m.id === profile.id,
           };
         })
@@ -228,7 +228,7 @@ export default function Rankings({ group, profile }) {
           <RankingList
             rows={groupRows}
             medals={medals}
-            totalPickable={totalPickable}
+            maxActions={maxActions}
           />
           <div style={{ marginTop: 24 }}>
             <InviteShare group={group} />
@@ -246,7 +246,7 @@ export default function Rankings({ group, profile }) {
           <RankingList
             rows={playersRows}
             medals={medals}
-            totalPickable={totalPickable}
+            maxActions={maxActions}
           />
         </>
       )}
@@ -377,7 +377,7 @@ export default function Rankings({ group, profile }) {
   );
 }
 
-function RankingList({ rows, medals, totalPickable }) {
+function RankingList({ rows, medals, maxActions }) {
   if (rows.length === 0)
     return (
       <div
@@ -452,11 +452,11 @@ function RankingList({ rows, medals, totalPickable }) {
                 fontSize: 11,
                 marginTop: 2,
                 color:
-                  row.picks >= totalPickable ? "var(--green)" : "var(--text3)",
+                  row.actions >= maxActions ? "var(--green)" : "var(--text3)",
               }}
             >
-              {row.picks} / {totalPickable} picks completed
-              {row.picks >= totalPickable && " ✓"}
+              {row.actions} / {maxActions} actions completed
+              {row.actions >= maxActions && " ✓"}
             </div>
           </div>
           <div style={{ textAlign: "right", flexShrink: 0 }}>
