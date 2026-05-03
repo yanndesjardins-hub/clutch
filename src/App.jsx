@@ -5,6 +5,7 @@ import {
   Navigate,
   useNavigate,
   useParams,
+  useLocation,
   Outlet,
 } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
@@ -21,6 +22,17 @@ import ResetPassword from "./pages/ResetPassword";
 import Prize from "./pages/Prize";
 import Specials from "./pages/Specials";
 import Navbar from "./components/Navbar";
+
+// Reset scroll to top whenever the route changes. Pages that need a
+// custom landing position (e.g. SeriesView auto-scrolling to current
+// round) override this with their own scrollIntoView after data load.
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 function Loader() {
   return (
@@ -109,7 +121,9 @@ export default function App() {
   }
 
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       <Route path="/join/:code" element={<JoinRoute profile={profile} />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/terms" element={<Terms />} />
@@ -172,6 +186,7 @@ export default function App() {
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+      </Routes>
+    </>
   );
 }
