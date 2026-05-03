@@ -119,7 +119,7 @@ export default function App() {
         path="/"
         element={
           activeGroup ? (
-            <Navigate to="/group/bracket" replace />
+            <Navigate to="/group/series" replace />
           ) : (
             <GroupHub profile={profile} onSelectGroup={selectGroup} />
           )
@@ -168,7 +168,7 @@ export default function App() {
             />
           }
         />
-        <Route index element={<Navigate to="bracket" replace />} />
+        <Route index element={<Navigate to="series" replace />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

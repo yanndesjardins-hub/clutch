@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { BRACKET, TEAMS, TEAM_BY_ABBR } from "../lib/constants";
 import { buildSeriesMap } from "../lib/nbaApi";
 import { supabase } from "../lib/supabase";
@@ -64,6 +64,8 @@ export default function SeriesView({ group, profile }) {
   const [predictions, setPredictions] = useState({});
   const [modal, setModal] = useState(null);
   const [loading, setLoading] = useState(true);
+  const sectionRefs = useRef({});
+  const hasScrolledRef = useRef(false);
 
   const load = useCallback(async () => {
     try {
@@ -91,6 +93,31 @@ export default function SeriesView({ group, profile }) {
     const t = setInterval(load, 5 * 60 * 1000);
     return () => clearInterval(t);
   }, [load]);
+
+  // Scroll to the most advanced round with at least one matchup known.
+  // Runs once after the first successful load to land users where the action is.
+  useEffect(() => {
+    if (loading || hasScrolledRef.current) return;
+    let target = null;
+    for (let i = ROUNDS.length - 1; i >= 0; i--) {
+      const { keys, round } = ROUNDS[i];
+      const hasKnown = keys.some(({ key }) => {
+        const s = seriesMap[key];
+        return s?.teamA && s?.teamB;
+      });
+      if (hasKnown) {
+        target = round;
+        break;
+      }
+    }
+    if (target && sectionRefs.current[target]) {
+      sectionRefs.current[target].scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+      hasScrolledRef.current = true;
+    }
+  }, [loading, seriesMap]);
 
   async function savePrediction({
     seriesKey,
@@ -165,7 +192,13 @@ export default function SeriesView({ group, profile }) {
         }));
 
         return (
-          <div key={round} style={{ marginBottom: 28 }}>
+          <div
+            key={round}
+            ref={(el) => {
+              sectionRefs.current[round] = el;
+            }}
+            style={{ marginBottom: 28 }}
+          >
             {/* Round header */}
             <div
               style={{
