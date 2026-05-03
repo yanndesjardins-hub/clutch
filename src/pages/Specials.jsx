@@ -94,7 +94,7 @@ export default function Specials({ profile }) {
         </div>
       ) : (
         <>
-          <Section label="Open" items={open}>
+          <Section label="Special questions" items={open}>
             {open.map((q) => (
               <QuestionCard
                 key={q.id}
