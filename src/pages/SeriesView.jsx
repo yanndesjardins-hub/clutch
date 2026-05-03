@@ -197,7 +197,7 @@ export default function SeriesView({ group, profile }) {
             ref={(el) => {
               sectionRefs.current[round] = el;
             }}
-            style={{ marginBottom: 28 }}
+            style={{ marginBottom: 28, scrollMarginTop: 64 }}
           >
             {/* Round header */}
             <div
