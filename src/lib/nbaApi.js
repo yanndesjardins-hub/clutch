@@ -54,12 +54,17 @@ function computeSeriesFromGames(games, abbrA, abbrB) {
 
   let winsA = 0,
     winsB = 0,
-    playedCount = 0;
+    startedCount = 0,
+    finalCount = 0;
   sg.forEach((g) => {
     const hs = g.home_team_score,
       vs = g.visitor_team_score;
     if (!hs || !vs) return;
-    playedCount++;
+    startedCount++;
+    // Only finished games count toward the series wins
+    const isFinal = typeof g.status === "string" && g.status.toLowerCase().startsWith("final");
+    if (!isFinal) return;
+    finalCount++;
     const homeWon = hs > vs;
     const aIsHome = g.home_team.abbreviation === abbrA;
     if (homeWon) aIsHome ? winsA++ : winsB++;
@@ -67,7 +72,7 @@ function computeSeriesFromGames(games, abbrA, abbrB) {
   });
 
   // Series is "upcoming" until at least one game has actually been played
-  if (playedCount === 0) {
+  if (startedCount === 0) {
     return {
       status: "upcoming",
       winsA: 0,
@@ -84,9 +89,9 @@ function computeSeriesFromGames(games, abbrA, abbrB) {
     status: done ? "finished" : "active",
     winsA,
     winsB,
-    gamesPlayed: playedCount,
+    gamesPlayed: finalCount,
     winner: done ? (winsA === 4 ? abbrA : abbrB) : null,
-    actualGames: done ? playedCount : null,
+    actualGames: done ? finalCount : null,
     game1Date,
   };
 }
