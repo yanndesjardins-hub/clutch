@@ -62,7 +62,18 @@ export default function Specials({ profile }) {
   if (loading)
     return (
       <div className="page text-center" style={{ paddingTop: 60 }}>
-        🏀 Loading specials…
+        <img
+          src="/clutch_logo_ball.png"
+          alt=""
+          style={{
+            width: 48,
+            height: 48,
+            display: "block",
+            margin: "0 auto 12px",
+            animation: "loader-pulse 1.4s ease-in-out infinite",
+          }}
+        />
+        Loading specials…
       </div>
     );
 

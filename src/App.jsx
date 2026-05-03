@@ -42,10 +42,17 @@ function Loader() {
         alignItems: "center",
         justifyContent: "center",
         height: "100vh",
-        fontSize: 40,
       }}
     >
-      🏀
+      <img
+        src="/clutch_logo_ball.png"
+        alt="Loading"
+        style={{
+          width: 80,
+          height: 80,
+          animation: "loader-pulse 1.4s ease-in-out infinite",
+        }}
+      />
     </div>
   );
 }
