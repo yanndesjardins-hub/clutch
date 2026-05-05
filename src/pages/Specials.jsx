@@ -334,18 +334,22 @@ function QuestionCard({ question, userAnswer, status, onAnswerClick }) {
               weight = 700;
               icon = "✓";
             }
-          } else if (hasAnswered) {
-            // User lost — correct answer in gray, user's wrong pick in red
-            if (isUserChoice) {
+          } else {
+            // User lost OR didn't answer
+            //  - user's wrong pick in red with ✗
+            //  - correct answer subtly highlighted in gray with ✓
+            if (hasAnswered && isUserChoice) {
               bg = "rgba(255, 80, 80, 0.12)";
               border = "var(--red)";
               color = "var(--red)";
               weight = 700;
               icon = "✗";
+            } else if (isCorrectChoice) {
+              bg = "rgba(170, 170, 170, 0.14)";
+              border = "var(--text3)";
+              icon = "✓";
             }
-            // correct choice stays gray (default styling)
           }
-          // No answer + resolved → all choices stay default gray
 
           return (
             <div
