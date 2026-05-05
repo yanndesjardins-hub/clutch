@@ -73,9 +73,14 @@ export const BRACKET = {
 }
 
 // ─── Scoring ──────────────────────────────────────────────────────────────────
+// Series picks scale by round to reward predicting deeper-stage matchups.
 export const SCORING = {
   initial: { winner: 5, gamesBonus: 10 }, // 5 + 10 = 15 max
-  series:  { winner: 4, gamesBonus: 8  }, // 4 + 8  = 12 max
+  series: {
+    r2:     { winner: 4,  gamesBonus: 8  }, //  4 +  8 = 12 max
+    r3:     { winner: 7,  gamesBonus: 14 }, //  7 + 14 = 21 max
+    finals: { winner: 10, gamesBonus: 20 }, // 10 + 20 = 30 max
+  },
   confFinalist: 10,
   finalist:     20,
   champion:     50,

@@ -1,9 +1,19 @@
 import { SCORING } from './constants'
 
 // ─── Points for a series prediction ──────────────────────────────────────────
+// Series picks scale by round (R2 < R3 < Finals). Initial picks are flat.
+function configFor(pred) {
+  if (pred.type === 'initial') return SCORING.initial
+  if (pred.type !== 'series') return SCORING.initial // safety fallback
+  const key = pred.series_key || ''
+  if (key.startsWith('finals')) return SCORING.series.finals
+  if (key.includes('_r3_'))     return SCORING.series.r3
+  return SCORING.series.r2 // R2 (default for any series pick that isn't r3 or finals)
+}
+
 export function calcSeriesPts(pred, series) {
   if (!series?.winner || !pred?.predicted_winner) return 0
-  const config = SCORING[pred.type] || SCORING.initial
+  const config = configFor(pred)
   let pts = 0
   if (pred.predicted_winner === series.winner) {
     pts += config.winner

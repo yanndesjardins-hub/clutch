@@ -128,7 +128,7 @@ export default function Specials({ profile }) {
             ))}
           </Section>
 
-          <Section label="Resolved" items={resolved}>
+          <Section label="Passed" items={resolved}>
             {resolved.map((q) => (
               <QuestionCard
                 key={q.id}
@@ -213,13 +213,23 @@ function QuestionCard({ question, userAnswer, status, onAnswerClick }) {
       ? "#9170ff"
       : status === "closed"
         ? "var(--text3)"
-        : "var(--green)";
+        : "var(--text3)";
   const statusLabel =
     status === "open"
       ? "⏳ OPEN"
       : status === "closed"
         ? "⏸ AWAITING RESULT"
-        : "✅ RESOLVED";
+        : "PASSED";
+
+  // Top-right result indicator (resolved only)
+  const resultBadge = isResolved
+    ? hasAnswered
+      ? {
+          text: isCorrect ? `+${earnedPts} pts ✓` : "0 pts ✗",
+          color: isCorrect ? "var(--green)" : "var(--red)",
+        }
+      : { text: "No answer", color: "var(--text3)" }
+    : null;
 
   return (
     <div className="card" style={cardStyle}>
@@ -248,6 +258,18 @@ function QuestionCard({ question, userAnswer, status, onAnswerClick }) {
           <button className="btn btn-ghost btn-sm" onClick={onAnswerClick}>
             {hasAnswered ? "Edit answer" : "+ Add answer"}
           </button>
+        )}
+        {resultBadge && (
+          <span
+            style={{
+              fontFamily: "inter",
+              fontWeight: 700,
+              fontSize: 12,
+              color: resultBadge.color,
+            }}
+          >
+            {resultBadge.text}
+          </span>
         )}
       </div>
 
@@ -286,6 +308,45 @@ function QuestionCard({ question, userAnswer, status, onAnswerClick }) {
         {question.choices.map((c, i) => {
           const isUserChoice = userAnswer?.choice === i;
           const isCorrectChoice = isResolved && i === question.correct_choice;
+
+          // Compute styling per state
+          let bg = "var(--bg3)";
+          let border = "var(--border)";
+          let color = "var(--text2)";
+          let weight = 500;
+          let icon = "";
+
+          if (!isResolved) {
+            // OPEN / AWAITING — purple highlight on user's pick
+            if (isUserChoice) {
+              bg = "rgba(145, 112, 255, 0.12)";
+              border = "#9170ff";
+              color = "#fff";
+              weight = 700;
+              if (isOpen) icon = "•";
+            }
+          } else if (isCorrect) {
+            // User won — highlight the (correct = user's) choice in green
+            if (isCorrectChoice) {
+              bg = "rgba(64, 199, 119, 0.15)";
+              border = "var(--green)";
+              color = "var(--green)";
+              weight = 700;
+              icon = "✓";
+            }
+          } else if (hasAnswered) {
+            // User lost — correct answer in gray, user's wrong pick in red
+            if (isUserChoice) {
+              bg = "rgba(255, 80, 80, 0.12)";
+              border = "var(--red)";
+              color = "var(--red)";
+              weight = 700;
+              icon = "✗";
+            }
+            // correct choice stays gray (default styling)
+          }
+          // No answer + resolved → all choices stay default gray
+
           return (
             <div
               key={i}
@@ -296,65 +357,34 @@ function QuestionCard({ question, userAnswer, status, onAnswerClick }) {
                 gap: 8,
                 padding: "8px 12px",
                 borderRadius: "var(--r)",
-                background: isCorrectChoice
-                  ? "rgba(64, 199, 119, 0.15)"
-                  : isUserChoice
-                    ? "rgba(145, 112, 255, 0.12)"
-                    : "var(--bg3)",
-                border: `1px solid ${
-                  isCorrectChoice
-                    ? "var(--green)"
-                    : isUserChoice
-                      ? "#9170ff"
-                      : "var(--border)"
-                }`,
+                background: bg,
+                border: `1px solid ${border}`,
                 fontSize: 13,
-                color: isCorrectChoice
-                  ? "var(--green)"
-                  : isUserChoice
-                    ? "#fff"
-                    : "var(--text2)",
-                fontWeight: isCorrectChoice || isUserChoice ? 700 : 500,
+                color,
+                fontWeight: weight,
               }}
             >
               <span>{c}</span>
-              <span style={{ fontSize: 12 }}>
-                {isCorrectChoice ? "✓" : isUserChoice && !isResolved ? "•" : ""}
-              </span>
+              <span style={{ fontSize: 12 }}>{icon}</span>
             </div>
           );
         })}
       </div>
 
-      {/* Footer: reward + result */}
+      {/* Footer: reward */}
       <div
         style={{
           marginTop: 12,
           paddingTop: 10,
           borderTop: "1px solid var(--border)",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
           fontSize: 12,
+          color: "var(--text3)",
         }}
       >
-        <span style={{ color: "var(--text3)" }}>
-          Reward: <strong style={{ color: "var(--text2)" }}>{question.points} pts</strong>
-        </span>
-        {isResolved && hasAnswered && (
-          <span
-            style={{
-              fontFamily: "inter",
-              fontWeight: 700,
-              color: isCorrect ? "var(--green)" : "var(--red)",
-            }}
-          >
-            {isCorrect ? `+${earnedPts} pts ✓` : "0 pts ✗"}
-          </span>
-        )}
-        {isResolved && !hasAnswered && (
-          <span style={{ color: "var(--text3)" }}>No answer</span>
-        )}
+        Reward:{" "}
+        <strong style={{ color: "var(--text2)" }}>
+          {question.points} pts
+        </strong>
       </div>
     </div>
   );
