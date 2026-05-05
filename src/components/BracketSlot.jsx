@@ -20,8 +20,8 @@ export default function BracketSlot({ series, userPick, userGames, onClick, isEd
     return (
       <div style={{
         ...S.row,
-        background: isPicked ? `${team.color}18` : 'transparent',
-        borderLeft: isPicked ? `3px solid ${team.color}` : '3px solid transparent',
+        background: isPicked ? 'rgba(255, 255, 255, 0.04)' : 'transparent',
+        borderLeft: isPicked ? '3px solid #fff' : '3px solid transparent',
       }}>
         <span style={{ fontSize:15 }}>{team.emoji}</span>
         <span style={{ fontFamily:'Barlow Condensed', fontWeight:700, fontSize:13, textTransform:'uppercase', flex:1 }}>
