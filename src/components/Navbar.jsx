@@ -150,20 +150,20 @@ export default function Navbar({ group, onLeave, profile }) {
           alignItems: "center",
           justifyContent: "space-between",
           padding: "0 16px",
-          height: 48,
+          height: 72,
         }}
       >
         <img
           src="/clutch_logo.png"
           alt="Clutch"
           onClick={onLeave}
-          style={{ height: 44, cursor: "pointer", transition: "opacity 0.2s" }}
+          style={{ height: 66, cursor: "pointer", transition: "opacity 0.2s" }}
           onMouseEnter={(e) => (e.target.style.opacity = "0.75")}
           onMouseLeave={(e) => (e.target.style.opacity = "1")}
         />
         <span
           style={{
-            fontSize: 12,
+            fontSize: 18,
             color: "var(--text3)",
             fontFamily: "Barlow Condensed",
             letterSpacing: 1,
@@ -252,7 +252,7 @@ export default function Navbar({ group, onLeave, profile }) {
       </nav>
 
       {/* Top spacer */}
-      <div style={{ height: 48 }} />
+      <div style={{ height: 72 }} />
     </>
   );
 }
