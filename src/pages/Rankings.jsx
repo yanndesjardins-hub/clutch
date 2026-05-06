@@ -3,6 +3,7 @@ import { supabase } from "../lib/supabase";
 import { buildSeriesMap } from "../lib/nbaApi";
 import { calcTotalPts, calcSpecialPts } from "../lib/scoring";
 import { BRACKET } from "../lib/constants";
+import ShareIcon from "../components/ShareIcon";
 
 // All series keys across all rounds
 const ALL_SERIES_KEYS = [
@@ -503,7 +504,13 @@ function InviteShare({ group }) {
         Invite more people to this group
       </p>
       <button className="btn btn-ghost btn-full" onClick={copy}>
-        {copied ? "✅ Link copied!" : "📲 Copy invite link"}
+        {copied ? (
+          "✅ Link copied!"
+        ) : (
+          <>
+            <ShareIcon /> <span style={{ marginLeft: 6 }}>Copy invite link</span>
+          </>
+        )}
       </button>
       <p
         style={{

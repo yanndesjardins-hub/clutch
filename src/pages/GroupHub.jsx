@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import Countdown from '../components/Countdown'
+import ShareIcon from '../components/ShareIcon'
 
 
 const CLUTCH_LEAGUE_NAME = 'Clutch League'
@@ -143,7 +144,7 @@ export default function GroupHub({ profile, onSelectGroup }) {
                   </div>
                 </div>
                 <button className="btn btn-ghost btn-sm" onClick={() => copyInvite(g)}>
-                  {copied===g.id ? '✅' : '📲'}
+                  {copied===g.id ? '✅' : <ShareIcon />}
                 </button>
                 <button className="btn btn-purple btn-sm" onClick={() => onSelectGroup(g)}>
                   Enter →
