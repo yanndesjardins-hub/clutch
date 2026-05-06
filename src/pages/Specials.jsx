@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabase";
 import Countdown from "../components/Countdown";
 import Chrono from "../components/Chrono";
-import SpecialAnswerModal from "../components/SpecialAnswerModal";
 
 // Question lifecycle: open / closed / resolved
 function getStatus(q) {
@@ -14,7 +13,6 @@ function getStatus(q) {
 export default function Specials({ profile }) {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({}); // by question_id
-  const [modal, setModal] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -45,8 +43,19 @@ export default function Specials({ profile }) {
     load();
   }, [load]);
 
-  async function saveAnswer({ questionId, choice }) {
-    await supabase.from("special_answers").upsert(
+  // Tap a choice = save instantly with optimistic update
+  async function handleChoiceClick(questionId, choice) {
+    // Optimistic local update
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: {
+        ...(prev[questionId] || {}),
+        user_id: profile.id,
+        question_id: questionId,
+        choice,
+      },
+    }));
+    const { error } = await supabase.from("special_answers").upsert(
       {
         user_id: profile.id,
         question_id: questionId,
@@ -55,8 +64,10 @@ export default function Specials({ profile }) {
       },
       { onConflict: "user_id,question_id" },
     );
-    await load();
-    setModal(null);
+    if (error) {
+      // Revert by reloading from server
+      await load();
+    }
   }
 
   if (loading)
@@ -112,7 +123,7 @@ export default function Specials({ profile }) {
                 question={q}
                 userAnswer={answers[q.id]}
                 status="open"
-                onAnswerClick={() => setModal({ question: q })}
+                onChoiceClick={(choice) => handleChoiceClick(q.id, choice)}
               />
             ))}
           </Section>
@@ -139,17 +150,6 @@ export default function Specials({ profile }) {
             ))}
           </Section>
         </>
-      )}
-
-      {modal && (
-        <SpecialAnswerModal
-          question={modal.question}
-          currentAnswer={answers[modal.question.id]}
-          onSave={(pick) =>
-            saveAnswer({ questionId: modal.question.id, ...pick })
-          }
-          onClose={() => setModal(null)}
-        />
       )}
     </div>
   );
@@ -189,31 +189,19 @@ function Section({ label, items, children }) {
   );
 }
 
-function QuestionCard({ question, userAnswer, status, onAnswerClick }) {
+function QuestionCard({ question, userAnswer, status, onChoiceClick }) {
   const isOpen = status === "open";
   const isResolved = status === "resolved";
   const hasAnswered = userAnswer != null;
   const isCorrect = isResolved && userAnswer?.choice === question.correct_choice;
   const earnedPts = isResolved && isCorrect ? question.points : 0;
 
-  // Card visual state (mirrors Series cards)
-  const pickable = isOpen;
-  const cardStyle =
-    pickable && !hasAnswered
-      ? {
-          borderColor: "#9170ff",
-          background: "rgba(145, 112, 255, 0.2)",
-        }
-      : isOpen
-        ? { borderColor: "#9170ff" }
-        : {};
+  const cardStyle = isOpen ? { borderColor: "#9170ff" } : {};
 
   const statusColor =
     status === "open"
       ? "#9170ff"
-      : status === "closed"
-        ? "var(--text3)"
-        : "var(--text3)";
+      : "var(--text3)";
   const statusLabel =
     status === "open"
       ? "⏳ OPEN"
@@ -254,11 +242,6 @@ function QuestionCard({ question, userAnswer, status, onAnswerClick }) {
         >
           {statusLabel}
         </span>
-        {isOpen && (
-          <button className="btn btn-ghost btn-sm" onClick={onAnswerClick}>
-            {hasAnswered ? "Edit answer" : "+ Add answer"}
-          </button>
-        )}
         {resultBadge && (
           <span
             style={{
@@ -303,8 +286,14 @@ function QuestionCard({ question, userAnswer, status, onAnswerClick }) {
         {question.question_text}
       </div>
 
-      {/* Choices (read-only display) */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      {/* Choices — 2-column grid, tap-to-answer when open */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 6,
+        }}
+      >
         {question.choices.map((c, i) => {
           const isUserChoice = userAnswer?.choice === i;
           const isCorrectChoice = isResolved && i === question.correct_choice;
@@ -351,25 +340,33 @@ function QuestionCard({ question, userAnswer, status, onAnswerClick }) {
             }
           }
 
+          const clickable = isOpen;
           return (
             <div
               key={i}
+              onClick={
+                clickable ? () => onChoiceClick && onChoiceClick(i) : undefined
+              }
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
                 gap: 8,
-                padding: "8px 12px",
+                padding: "10px 12px",
+                minHeight: 42,
                 borderRadius: "var(--r)",
                 background: bg,
                 border: `1px solid ${border}`,
                 fontSize: 13,
                 color,
                 fontWeight: weight,
+                cursor: clickable ? "pointer" : "default",
+                userSelect: "none",
+                transition: "background 0.15s, border-color 0.15s",
               }}
             >
-              <span>{c}</span>
-              <span style={{ fontSize: 12 }}>{icon}</span>
+              <span style={{ flex: 1 }}>{c}</span>
+              {icon && <span style={{ fontSize: 12 }}>{icon}</span>}
             </div>
           );
         })}
