@@ -40,7 +40,7 @@ export default function Countdown() {
   if (over)
     return (
       <div style={bannerStyle}>
-        Semi Finals picks and Special Questions now open !
+        Check your app everyday for new questions !
       </div>
     );
 
