@@ -344,6 +344,7 @@ function QuestionCard({ question, userAnswer, status, onChoiceClick }) {
           return (
             <div
               key={i}
+              className={clickable ? "specials-choice-open" : undefined}
               onClick={
                 clickable ? () => onChoiceClick && onChoiceClick(i) : undefined
               }
