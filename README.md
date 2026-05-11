@@ -1,4 +1,4 @@
-# 🏀 Hoops Cup — Mode Opératoire
+# 🏀 Clutch Game — Mode Opératoire
 
 > App de pronostics NBA Playoffs 2026 pour groupes de potes.
 
