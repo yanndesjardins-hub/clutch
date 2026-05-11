@@ -79,14 +79,14 @@ export default function PlayoffView({ group, profile }) {
     return true;
   }
 
+  // Bracket always shows the INITIAL pick so players keep a visual trace of
+  // their starting bracket, even after submitting per-series picks later.
   function getUserPick(key) {
-    const p = predictions[key];
-    return p?.series?.predicted_winner || p?.initial?.predicted_winner || null;
+    return predictions[key]?.initial?.predicted_winner || null;
   }
 
   function getUserGames(key) {
-    const p = predictions[key];
-    return p?.series?.predicted_games || p?.initial?.predicted_games || null;
+    return predictions[key]?.initial?.predicted_games || null;
   }
 
   function getCurrentPick(key) {
