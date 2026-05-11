@@ -238,9 +238,8 @@ export default function PlayoffView({ group, profile }) {
         <div
           style={{
             display: "flex",
-            gap: 12,
             minWidth: "max-content",
-            alignItems: "flex-start",
+            alignItems: "stretch",
           }}
         >
           <RoundCol
@@ -253,12 +252,11 @@ export default function PlayoffView({ group, profile }) {
             setModal={setModal}
           />
 
-          <Connector count={2} />
+          <Connector pairs={2} />
 
           <RoundCol
             title="Semifinals"
             slots={slots.r2}
-            topOffset={48}
             getUserPick={getUserPick}
             getUserGames={getUserGames}
             getCurrentPick={getCurrentPick}
@@ -266,12 +264,11 @@ export default function PlayoffView({ group, profile }) {
             setModal={setModal}
           />
 
-          <Connector count={1} />
+          <Connector pairs={1} />
 
           <RoundCol
             title="Conf. Finals"
             slots={slots.r3}
-            topOffset={144}
             getUserPick={getUserPick}
             getUserGames={getUserGames}
             getCurrentPick={getCurrentPick}
@@ -279,47 +276,17 @@ export default function PlayoffView({ group, profile }) {
             setModal={setModal}
           />
 
-          <Connector count={1} />
+          <Connector straight />
 
-          {/* Finals — inline right of Conf Finals */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              
-              width: 168,
-              
-            }}
-          >
-            <div
-              className="condensed"
-              style={{
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: 3,
-                textTransform: "uppercase",
-                color: "var(--text3)",
-                textAlign: "center",
-                paddingBottom: 6,
-                borderBottom: "1px solid var(--border)",
-                marginBottom: 2,
-              }}
-            >
-              NBA Finals
-            </div>
-            <div style={{ marginTop:144 }}>
-            <BracketSlot
-              series={finalsSeries}
-              userPick={getUserPick("finals_0")}
-              userGames={getUserGames("finals_0")}
-              isEditable={isEditable(finalsSeries)}
-              onClick={() =>
-                isEditable(finalsSeries) &&
-                setModal({ seriesKey: "finals_0", series: finalsSeries })
-              }
-            />
-          </div>
-          </div>
+          <RoundCol
+            title="NBA Finals"
+            slots={[{ key: "finals_0", series: finalsSeries }]}
+            getUserPick={getUserPick}
+            getUserGames={getUserGames}
+            getCurrentPick={getCurrentPick}
+            isEditable={isEditable}
+            setModal={setModal}
+          />
         </div>
       </div>
 
@@ -341,79 +308,170 @@ export default function PlayoffView({ group, profile }) {
   );
 }
 
+const ROUND_HEADER_STYLE = {
+  fontSize: 10,
+  fontWeight: 800,
+  letterSpacing: 3,
+  textTransform: "uppercase",
+  color: "var(--text3)",
+  textAlign: "center",
+  paddingBottom: 6,
+  borderBottom: "1px solid var(--text3)",
+  marginBottom: 2,
+};
+
 function RoundCol({
   title,
   slots,
   getUserPick,
   getUserGames,
-  getCurrentPick,
   isEditable,
   setModal,
-  topOffset = 0,
 }) {
   return (
     <div
-      style={{ display: "flex", flexDirection: "column", gap: 8, width: 168 }}
+      style={{ display: "flex", flexDirection: "column", width: 168 }}
     >
-      <div
-        className="condensed"
-        style={{
-          fontSize: 10,
-          fontWeight: 800,
-          letterSpacing: 3,
-          textTransform: "uppercase",
-          color: "var(--text3)",
-          textAlign: "center",
-          paddingBottom: 6,
-          borderBottom: "1px solid var(--text3)",
-          marginBottom: 2,
-        }}
-      >
+      <div className="condensed" style={ROUND_HEADER_STYLE}>
         {title}
       </div>
       <div
         style={{
+          flex: 1,
           display: "flex",
           flexDirection: "column",
-          gap: 8,
-          paddingTop: topOffset,
         }}
       >
         {slots.map(({ key, series }) => (
-          <BracketSlot
+          <div
             key={key}
-            series={series || { teamA: null, teamB: null, status: "upcoming" }}
-            userPick={getUserPick(key)}
-            userGames={getUserGames(key)}
-            isEditable={isEditable(series || {})}
-            onClick={() =>
-              series &&
-              isEditable(series) &&
-              setModal({ seriesKey: key, series })
-            }
-          />
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              padding: "4px 0",
+            }}
+          >
+            <BracketSlot
+              series={series || { teamA: null, teamB: null, status: "upcoming" }}
+              userPick={getUserPick(key)}
+              userGames={getUserGames(key)}
+              isEditable={isEditable(series || {})}
+              onClick={() =>
+                series &&
+                isEditable(series) &&
+                setModal({ seriesKey: key, series })
+              }
+            />
+          </div>
         ))}
       </div>
     </div>
   );
 }
 
-function Connector({ count }) {
+function Connector({ pairs, straight }) {
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-around",
+        width: 24,
         alignSelf: "stretch",
-        paddingTop: 28,
       }}
     >
-      {Array.from({ length: count }).map((_, i) => (
-        <div key={i} style={{ flex: 1, display: "flex", alignItems: "center" }}>
-          <div style={{ width: 16, height: 2, background: "var(--border)" }} />
-        </div>
-      ))}
+      {/* Invisible header spacer so the connector area starts level with slot area */}
+      <div
+        className="condensed"
+        style={{ ...ROUND_HEADER_STYLE, visibility: "hidden" }}
+        aria-hidden="true"
+      >
+        &nbsp;
+      </div>
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {straight ? (
+          <StraightConnector />
+        ) : (
+          Array.from({ length: pairs }).map((_, i) => (
+            <BracketPairConnector key={i} />
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function BracketPairConnector() {
+  const line = "var(--border)";
+  return (
+    <div style={{ flex: 1, position: "relative" }}>
+      {/* Top feeder horizontal (from R1[i] center to vertical) */}
+      <div
+        style={{
+          position: "absolute",
+          top: "25%",
+          left: 0,
+          width: "50%",
+          height: 1,
+          background: line,
+        }}
+      />
+      {/* Bottom feeder horizontal */}
+      <div
+        style={{
+          position: "absolute",
+          top: "75%",
+          left: 0,
+          width: "50%",
+          height: 1,
+          background: line,
+        }}
+      />
+      {/* Vertical line joining the two feeders */}
+      <div
+        style={{
+          position: "absolute",
+          top: "25%",
+          bottom: "25%",
+          left: "calc(50% - 1px)",
+          width: 1,
+          background: line,
+        }}
+      />
+      {/* Output horizontal to next round's box center */}
+      <div
+        style={{
+          position: "absolute",
+          top: "calc(50% - 1px)",
+          left: "50%",
+          right: 0,
+          height: 1,
+          background: line,
+        }}
+      />
+    </div>
+  );
+}
+
+function StraightConnector() {
+  return (
+    <div style={{ flex: 1, position: "relative" }}>
+      <div
+        style={{
+          position: "absolute",
+          top: "calc(50% - 1px)",
+          left: 0,
+          right: 0,
+          height: 1,
+          background: "var(--border)",
+        }}
+      />
     </div>
   );
 }
