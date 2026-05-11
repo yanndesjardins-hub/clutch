@@ -88,6 +88,9 @@ export default function Specials({ profile }) {
       </div>
     );
 
+  // Stable question number (1-based) based on master sort order (by deadline asc).
+  const numberById = new Map(questions.map((q, i) => [q.id, i + 1]));
+
   // Group by status
   const open = [];
   const closed = [];
@@ -121,6 +124,7 @@ export default function Specials({ profile }) {
               <QuestionCard
                 key={q.id}
                 question={q}
+                number={numberById.get(q.id)}
                 userAnswer={answers[q.id]}
                 status="open"
                 onChoiceClick={(choice) => handleChoiceClick(q.id, choice)}
@@ -133,6 +137,7 @@ export default function Specials({ profile }) {
               <QuestionCard
                 key={q.id}
                 question={q}
+                number={numberById.get(q.id)}
                 userAnswer={answers[q.id]}
                 status="closed"
               />
@@ -144,6 +149,7 @@ export default function Specials({ profile }) {
               <QuestionCard
                 key={q.id}
                 question={q}
+                number={numberById.get(q.id)}
                 userAnswer={answers[q.id]}
                 status="resolved"
               />
@@ -189,7 +195,7 @@ function Section({ label, items, children }) {
   );
 }
 
-function QuestionCard({ question, userAnswer, status, onChoiceClick }) {
+function QuestionCard({ question, number, userAnswer, status, onChoiceClick }) {
   const isOpen = status === "open";
   const isResolved = status === "resolved";
   const hasAnswered = userAnswer != null;
@@ -373,20 +379,30 @@ function QuestionCard({ question, userAnswer, status, onChoiceClick }) {
         })}
       </div>
 
-      {/* Footer: reward */}
+      {/* Footer: reward (left) + question number (right) */}
       <div
         style={{
           marginTop: 12,
           paddingTop: 10,
           borderTop: "1px solid var(--border)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
           fontSize: 12,
           color: "var(--text3)",
         }}
       >
-        Reward:{" "}
-        <strong style={{ color: "var(--text2)" }}>
-          {question.points} pts
-        </strong>
+        <span>
+          Reward:{" "}
+          <strong style={{ color: "var(--text2)" }}>
+            {question.points} pts
+          </strong>
+        </span>
+        {number != null && (
+          <span style={{ color: "var(--text3)" }}>
+            #{String(number).padStart(2, "0")}
+          </span>
+        )}
       </div>
     </div>
   );
