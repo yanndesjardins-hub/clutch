@@ -38,9 +38,16 @@ export default function BracketSlot({ series, userPick, userGames, onClick, isEd
     )
   }
 
-  const pickedA    = userPick === teamA?.abbr
-  const pickedB    = userPick === teamB?.abbr
-  const pickedTeam = pickedA ? teamA : pickedB ? teamB : null
+  const pickedA    = !!userPick && userPick === teamA?.abbr
+  const pickedB    = !!userPick && userPick === teamB?.abbr
+  // Show the user's initial pick even if that team is no longer in this
+  // matchup (e.g. eliminated in a previous round), so the bracket keeps a
+  // visible trace of the original prediction vs reality.
+  const pickedTeam = userPick ? (TEAM_BY_ABBR[userPick] || null) : null
+
+  const actualGames   = (series?.winsA || 0) + (series?.winsB || 0)
+  const correctWinner = status === 'finished' && series?.winner === pickedTeam?.abbr
+  const perfectPick   = correctWinner && !!userGames && userGames === actualGames
 
   return (
     <div
@@ -80,7 +87,7 @@ export default function BracketSlot({ series, userPick, userGames, onClick, isEd
             ? (series.winner === pickedTeam.abbr ? 'var(--green)' : 'var(--red)')
             : 'var(--text3)',
         }}>
-          MY PICK: {pickedTeam.abbr}{userGames ? ` IN ${userGames}` : ''}
+          MY PICK: {pickedTeam.abbr}{userGames ? ` IN ${userGames}` : ''}{perfectPick ? ' 🔥' : ''}
         </div>
       ) : isEditable ? (
         <div style={{ marginTop:6, fontSize:10, color:'var(--text)', textAlign:'center' }}>
